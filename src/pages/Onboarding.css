@@ -45,6 +45,30 @@
   box-sizing: border-box;
 }
 
+/* Wizard card: cap to viewport so very long step bodies (e.g. scope
+   with many filters) scroll inside the card instead of the page. The
+   progress bar and footer stay pinned; only .onboarding-card-body
+   scrolls. Short content keeps the card compact (flex children only
+   shrink when they need to). */
+.onboarding-card-wizard {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 128px);
+}
+
+.onboarding-card-body {
+  /* min-height: 0 lets this child shrink below its content size so
+     overflow-y kicks in. Without it, flex containers refuse to shrink
+     past content and the scroll never engages. */
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  /* Pull the scrollbar slightly inside the card padding so it doesn't
+     hug the content; matches InstUI's quiet scrollbar treatment. */
+  margin-right: -16px;
+  padding-right: 16px;
+}
+
 /* progress bar */
 .onboarding-progress {
   height: 4px;

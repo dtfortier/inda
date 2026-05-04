@@ -30,6 +30,19 @@ export const SCOPE_OPTIONS = {
     'College of Law',
   ],
   term: ['Spring 2026', 'Fall 2025', 'Summer 2025', 'Spring 2025', 'All active terms'],
+  studentGroups: [
+    'Students on Probation',
+    'Undecided/Exploratory Students',
+    'International Students',
+    'Student Athletes',
+    'Biology Majors',
+    'First-generation Students',
+    'Transfer Students',
+    'Honors Program',
+    'Veterans',
+    'Online-only Students',
+    'Graduating Seniors',
+  ],
   courses: [
     'BIO 101 — Intro to Biology',
     'CS 201 — Data Structures',
@@ -37,6 +50,18 @@ export const SCOPE_OPTIONS = {
     'HIST 220 — World History',
     'MATH 150 — Calculus I',
     'PSY 105 — Intro to Psychology',
+  ],
+  courseGroups: [
+    'Independent Study',
+    'Pre-Registration Eligible',
+    'South Campus',
+    'Cross-Listed Courses',
+    'Capstone Courses',
+    'General Education Core',
+    'STEM Pathway',
+    'Honors Sections',
+    'Hybrid-Format Courses',
+    'Lab-Based Courses',
   ],
   instructors: [
     'Dr. Alicia Moreno',
@@ -48,23 +73,29 @@ export const SCOPE_OPTIONS = {
   modality: ['In-person', 'Online — asynchronous', 'Online — synchronous', 'Hybrid'],
 }
 
+/* Order here drives the order rendered on the scope step. */
 export const SCOPE_FIELDS = [
   { key: 'subAccounts', label: 'Sub Accounts' },
   { key: 'term', label: 'Term' },
+  { key: 'studentGroups', label: 'Student Groups' },
   { key: 'courses', label: 'Courses' },
+  { key: 'courseGroups', label: 'Course Groups' },
   { key: 'instructors', label: 'Instructors' },
   { key: 'modality', label: 'Modality' },
 ]
 
 /* Values Canvas pre-fills when the user chooses "Let Canvas Decide".
    The onboarding flow tracks these separately from user-added values so
-   the UI can mark suggested chips differently. */
+   the UI can mark suggested chips differently. Every key in SCOPE_OPTIONS
+   should appear here (use [] for fields with no default suggestion). */
 export const AUTO_RECOMMENDATIONS = {
   focusAreas: ['institution', 'course'],
   scope: {
     subAccounts: ['College of Business', 'College of Science', 'College of Arts'],
     term: ['Spring 2026'],
+    studentGroups: ['First-generation Students', 'Transfer Students'],
     courses: [],
+    courseGroups: ['Cross-Listed Courses'],
     instructors: [],
     modality: [],
   },

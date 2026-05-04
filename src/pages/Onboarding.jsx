@@ -401,7 +401,15 @@ export default function Onboarding({ onComplete, initialConfig }) {
   const [mode, setMode] = useState(initialConfig?.mode || 'manual')
   const [focusAreas, setFocusAreas] = useState(initialConfig?.focusAreas || [])
   const [scope, setScope] = useState(
-    initialConfig?.scope || { subAccounts: [], term: [], courses: [], instructors: [], modality: [] }
+    initialConfig?.scope || {
+      subAccounts: [],
+      term: [],
+      studentGroups: [],
+      courses: [],
+      courseGroups: [],
+      instructors: [],
+      modality: [],
+    }
   )
   /* Tracks which scope values were pre-filled by Canvas (auto mode) so
      chips can be visually distinguished from user-added ones. When a
@@ -412,7 +420,9 @@ export default function Onboarding({ onComplete, initialConfig }) {
       ? {
           subAccounts: [...AUTO_RECOMMENDATIONS.scope.subAccounts],
           term: [...AUTO_RECOMMENDATIONS.scope.term],
+          studentGroups: [...AUTO_RECOMMENDATIONS.scope.studentGroups],
           courses: [...AUTO_RECOMMENDATIONS.scope.courses],
+          courseGroups: [...AUTO_RECOMMENDATIONS.scope.courseGroups],
           instructors: [...AUTO_RECOMMENDATIONS.scope.instructors],
           modality: [...AUTO_RECOMMENDATIONS.scope.modality],
         }
@@ -433,14 +443,18 @@ export default function Onboarding({ onComplete, initialConfig }) {
       setScope({
         subAccounts: [...AUTO_RECOMMENDATIONS.scope.subAccounts],
         term: [...AUTO_RECOMMENDATIONS.scope.term],
+        studentGroups: [...AUTO_RECOMMENDATIONS.scope.studentGroups],
         courses: [...AUTO_RECOMMENDATIONS.scope.courses],
+        courseGroups: [...AUTO_RECOMMENDATIONS.scope.courseGroups],
         instructors: [...AUTO_RECOMMENDATIONS.scope.instructors],
         modality: [...AUTO_RECOMMENDATIONS.scope.modality],
       })
       setSuggestedScope({
         subAccounts: [...AUTO_RECOMMENDATIONS.scope.subAccounts],
         term: [...AUTO_RECOMMENDATIONS.scope.term],
+        studentGroups: [...AUTO_RECOMMENDATIONS.scope.studentGroups],
         courses: [...AUTO_RECOMMENDATIONS.scope.courses],
+        courseGroups: [...AUTO_RECOMMENDATIONS.scope.courseGroups],
         instructors: [...AUTO_RECOMMENDATIONS.scope.instructors],
         modality: [...AUTO_RECOMMENDATIONS.scope.modality],
       })
@@ -505,27 +519,37 @@ export default function Onboarding({ onComplete, initialConfig }) {
             style={{ width: `${(displayNumber / DISPLAY_TOTAL) * 100}%` }}
           />
         </div>
-        {currentKey === 'intro' && (
-          <StepIntro
-            mode={mode}
-            setMode={(next) => {
-              setMode(next)
-              /* Wipe downstream state so each mode starts clean. Auto
-                 gets repopulated by applyAutoRecommendations after the
-                 analyzing step, and the scope-empty check there relies
-                 on this reset. */
-              setFocusAreas([])
-              setScope({ subAccounts: [], term: [], courses: [], instructors: [], modality: [] })
-              setSuggestedScope({})
-            }}
-            stepNumber={displayNumber}
-            stepCount={DISPLAY_TOTAL}
-          />
-        )}
-        {currentKey === 'analyzing' && <StepAnalyzing onDone={handleAnalyzingDone} stepNumber={displayNumber} stepCount={DISPLAY_TOTAL} />}
-        {currentKey === 'focus' && <StepFocus focusAreas={focusAreas} toggleFocus={toggleFocus} mode={mode} stepNumber={displayNumber} stepCount={DISPLAY_TOTAL} />}
-        {currentKey === 'scope' && <StepScope scope={scope} setScope={setScope} suggestedScope={suggestedScope} mode={mode} stepNumber={displayNumber} stepCount={DISPLAY_TOTAL} />}
-        {currentKey === 'review' && <StepReview focusAreas={focusAreas} scope={scope} stepNumber={displayNumber} stepCount={DISPLAY_TOTAL} />}
+        <div className="onboarding-card-body">
+          {currentKey === 'intro' && (
+            <StepIntro
+              mode={mode}
+              setMode={(next) => {
+                setMode(next)
+                /* Wipe downstream state so each mode starts clean. Auto
+                   gets repopulated by applyAutoRecommendations after the
+                   analyzing step, and the scope-empty check there relies
+                   on this reset. */
+                setFocusAreas([])
+                setScope({
+                  subAccounts: [],
+                  term: [],
+                  studentGroups: [],
+                  courses: [],
+                  courseGroups: [],
+                  instructors: [],
+                  modality: [],
+                })
+                setSuggestedScope({})
+              }}
+              stepNumber={displayNumber}
+              stepCount={DISPLAY_TOTAL}
+            />
+          )}
+          {currentKey === 'analyzing' && <StepAnalyzing onDone={handleAnalyzingDone} stepNumber={displayNumber} stepCount={DISPLAY_TOTAL} />}
+          {currentKey === 'focus' && <StepFocus focusAreas={focusAreas} toggleFocus={toggleFocus} mode={mode} stepNumber={displayNumber} stepCount={DISPLAY_TOTAL} />}
+          {currentKey === 'scope' && <StepScope scope={scope} setScope={setScope} suggestedScope={suggestedScope} mode={mode} stepNumber={displayNumber} stepCount={DISPLAY_TOTAL} />}
+          {currentKey === 'review' && <StepReview focusAreas={focusAreas} scope={scope} stepNumber={displayNumber} stepCount={DISPLAY_TOTAL} />}
+        </div>
         <div className="onboarding-footer">
           {step > 1 ? (
             <button type="button" className="onboarding-btn secondary" onClick={handleBack}>
