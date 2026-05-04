@@ -1,0 +1,203 @@
+.dashboard-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+/* ── Page load animation ── */
+/* `to` uses `transform: none` (not `translateY(0)`) so the element doesn't
+   retain a containing block — otherwise fixed-position modal overlays
+   inside `.widget-pair` render relative to the pair instead of the viewport. */
+@keyframes dashboard-fade-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.dashboard-col-large > .widget-card,
+.dashboard-col-large > .widget-pair,
+.dashboard-col-medium > .widget-card {
+  animation: dashboard-fade-in 420ms ease-out both;
+  opacity: 0;
+}
+
+.dashboard-col-large > *:nth-child(1),
+.dashboard-col-medium > *:nth-child(1) { animation-delay: 40ms; }
+.dashboard-col-large > *:nth-child(2),
+.dashboard-col-medium > *:nth-child(2) { animation-delay: 100ms; }
+.dashboard-col-large > *:nth-child(3),
+.dashboard-col-medium > *:nth-child(3) { animation-delay: 160ms; }
+.dashboard-col-large > *:nth-child(4),
+.dashboard-col-medium > *:nth-child(4) { animation-delay: 220ms; }
+.dashboard-col-large > *:nth-child(5),
+.dashboard-col-medium > *:nth-child(5) { animation-delay: 280ms; }
+.dashboard-col-large > *:nth-child(6) { animation-delay: 340ms; }
+.dashboard-col-large > *:nth-child(7) { animation-delay: 400ms; }
+
+.widget-pair > .widget-card { animation: none; opacity: 1; }
+
+.dashboard-disclaimer {
+  animation: dashboard-fade-in 500ms ease-out 480ms both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-col-large > .widget-card,
+  .dashboard-col-large > .widget-pair,
+  .dashboard-col-medium > .widget-card,
+  .dashboard-disclaimer {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+.dashboard-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.dashboard-body {
+  padding: 0 var(--spacing-lg) var(--spacing-lg);
+}
+
+.dashboard-content {
+  display: flex;
+  gap: 32px;
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* Left column: large widgets */
+.dashboard-col-large {
+  width: 800px;
+  max-width: 800px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* Right column: medium widgets */
+.dashboard-col-medium {
+  width: 360px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Side-by-side pair inside large column */
+.widget-pair {
+  display: flex;
+  gap: 24px;
+}
+
+.widget-pair .widget-card {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── Responsive (INST UI breakpoints) ── */
+
+/* large: 1024–1199 — two columns, proportional */
+@media (max-width: 1199px) {
+  .dashboard-content { padding: 0 24px; gap: 24px; }
+  .dashboard-col-large {
+    width: auto;
+    max-width: none;
+    flex: 1 1 0;
+    min-width: 0;
+    gap: 24px;
+  }
+  .dashboard-col-medium { width: 320px; }
+}
+
+/* medium: 768–1023 — single column stack */
+@media (max-width: 1023px) {
+  .dashboard-content {
+    flex-direction: column;
+    gap: 24px;
+    padding: 0 24px;
+  }
+  .dashboard-col-large,
+  .dashboard-col-medium {
+    width: 100%;
+    max-width: 100%;
+    flex: none;
+    gap: 24px;
+  }
+  .widget-pair { flex-direction: column; }
+}
+
+/* small: <768 — tighter padding */
+@media (max-width: 767px) {
+  .dashboard-body { padding: 0 0 var(--spacing-md); }
+  .dashboard-content { padding: 0 16px; gap: 20px; }
+  .dashboard-col-large,
+  .dashboard-col-medium { gap: 20px; }
+}
+
+/* Disclaimer */
+.dashboard-disclaimer {
+  text-align: center;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  padding: 32px 0 16px;
+  margin: 0;
+}
+
+/* SINOA modal layout — stack chart + metrics, centered */
+.sinoa-modal-content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.sinoa-modal-chart {
+  width: 100%;
+  max-width: 560px;
+}
+
+.sinoa-stats {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 64px;
+  padding-top: 8px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.sinoa-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 100px;
+}
+
+.sinoa-stat-value {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 28px;
+  color: var(--color-text-primary);
+  line-height: 1.1;
+}
+
+.sinoa-stat-label {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 767px) {
+  .sinoa-stats { gap: 32px; }
+  .sinoa-stat-value { font-size: 22px; }
+}
+

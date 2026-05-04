@@ -1,0 +1,109 @@
+.topbar-frame {
+  flex-shrink: 0;
+  padding: var(--spacing-lg) var(--spacing-lg) 0 0;
+}
+
+.topbar-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  padding: 0 var(--spacing-lg);
+  width: 100%;
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex: 1;
+  min-width: 0;
+}
+
+.topbar-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.topbar-title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 1.25;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+/* Icon buttons */
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  border-radius: var(--radius-md);
+  border: 1px solid;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: opacity 0.15s;
+}
+
+.icon-btn:hover {
+  opacity: 0.85;
+}
+
+.icon-btn.primary {
+  background: var(--color-btn-primary-bg);
+  border-color: var(--color-btn-primary-bg);
+  color: var(--color-btn-primary-text);
+}
+
+.icon-btn.with-label {
+  width: auto;
+  min-width: 0;
+  padding: 0 12px;
+  gap: 8px;
+}
+
+.icon-btn-label {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.icon-btn.ai-gradient {
+  background: linear-gradient(165deg, var(--color-accent-ai-top) 0%, var(--color-accent-ai-bottom) 100%);
+  border-color: var(--color-accent-ai-top);
+  color: var(--color-btn-primary-text);
+}
+
+/* ── Responsive ── */
+.topbar-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 1023px) {
+  .topbar-bar { padding: 0 var(--spacing-md); height: 56px; }
+  .topbar-title { font-size: 18px; }
+}
+
+@media (max-width: 767px) {
+  .topbar-frame { padding: var(--spacing-md) var(--spacing-md) 0 0; }
+  .topbar-bar { padding: 0 var(--spacing-sm); }
+  .topbar-title { font-size: 16px; }
+  .topbar-left { gap: var(--spacing-xs); }
+  .topbar-right { gap: var(--spacing-xs); }
+}

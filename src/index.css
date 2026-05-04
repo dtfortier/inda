@@ -1,0 +1,58 @@
+@import url('https://fonts.googleapis.com/css2?family=Inclusive+Sans:wght@400;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --color-text-primary: #273540;
+  --color-text-muted: #576773;
+  --color-text-data: #586874;
+  --color-bg-page: #f2f4f4;
+  --color-bg-container: #fff;
+  --color-btn-primary-bg: #1d354f;
+  --color-btn-primary-text: #fff;
+  --color-accent-ai-top: #944fb3;
+  --color-accent-ai-bottom: #027887;
+  --color-shadow1: rgba(35, 68, 101, 0.15);
+  --color-shadow2: rgba(35, 68, 101, 0.1);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-card: 24px;
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 24px;
+  --shadow-elevation1:
+    0.001px 1px 2px 0.001px var(--color-shadow1),
+    0.001px 2px 4px 1px var(--color-shadow2);
+  --font-heading: 'Inclusive Sans', sans-serif;
+  --font-body: 'Atkinson Hyperlegible', system-ui, sans-serif;
+  /* INST UI breakpoints (instructure.design) */
+  --bp-medium: 768px;
+  --bp-large: 1024px;
+  --bp-xlarge: 1200px;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--color-bg-page);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+}
+
+@media (max-width: 767px) {
+  html, body, #root { height: auto; min-height: 100%; }
+  body { overflow: auto; }
+}

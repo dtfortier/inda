@@ -1,0 +1,45 @@
+1. Institution SnapshotRecommended Chart: KPI Grid (2x2)
+Labels (4): Total Enrollment, Course Activity Rate, Students with No Activity, Low Engagement Courses.
+Data Points: 14,200 total, 88% activity, 215 inactive, 32 low engagement.
+AI Insight: High enrollment stability is currently offset by a 3% uptick in student inactivity, suggesting a need for broader re-engagement campaigns this week.
+1. Sub-Account HealthRecommended Chart: Horizontal Bar List (360px) or Multi-line Trend (720px)
+Labels (3): Low Engagement, Missing Assignments, Instructor Inactivity.
+Data Points: Business: 14%, Science: 642 missing, Arts: 12 inactive.
+AI Insight: The Science Department is the primary driver of institutional risk due to a disproportionate volume of missing assignments compared to other sub-accounts.
+1. LTI AdoptionRecommended Chart: Horizontal Bar (360px) or Dual Horizontal Bar (720px)
+Labels (2): Total Launches, Unique Users.
+Data Points: Studio: 22.4k / 5.1k users, Zoom: 18.2k / 4.8k users.
+AI Insight: Tool utilization is heavily concentrated in video services, indicating a strong preference for synchronous learning over specialized third-party integrations.
+1. Faculty EngagementRecommended Chart: Scored Bar List (360px) or Signal Breakdown Bars (720px)
+Labels (6): Login Rate, Grading Turnaround, Passback Completion, Discussion Response, Content Updates, Tool Adoption.
+Data Points: 92% login, 2.1 days avg, 78% passback, 3.8/5 response, 4 updates/mo, 62% adoption.
+AI Insight: While login frequency is high, the 2.1-day grading turnaround suggests a feedback bottleneck that may be slowing student progression.
+1. Course MetricsRecommended Chart: KPI Grid (3x2)
+Labels (6): Total Courses, Unpublished, Avg Score, Below 70%, Low Activity, Ready for Term.
+Data Points: 850 total, 12 unpublished, 81% avg, 55 < 70%, 14 low activity, 838 ready.
+AI Insight: Institutional course quality remains high, with 98% of the catalog meeting term-start readiness benchmarks and maintaining a stable 81% average grade.
+1. Course StatusRecommended Chart: Horizontal Bar (360px) or Stacked Bar (720px)
+Labels (3): Published, Unpublished, Concluded.
+Data Points: 740 Published, 45 Unpublished, 2,100 Concluded.
+AI Insight: Current unpublished counts are 15% higher than the previous term's baseline, indicating a potential delay in content delivery for upcoming sessions.
+1. Course PerformanceRecommended Chart: KPI Grid (360px) or Breakdown Bar (720px)
+Labels (3): Courses < 70%, Low Activity Courses, Participation Rate.
+Data Points: 42 courses, 12 courses, 74% participation.
+AI Insight: A 5% drop in participation rate across flagged courses correlates strongly with the rise in courses averaging below a 70% threshold.
+1. Interaction Over TimeRecommended Chart: Single-axis Line (360px) or Dual-axis Line (720px)
+Labels (2): Weekly Participation, Weekly Page Views.
+Data Points: Week 8: 65% participation, 88,000 page views.
+AI Insight: Engagement metrics peaked in Week 6 and have since declined by 12%, signaling a mid-term "slump" that requires faculty intervention.
+1. Course ReadinessRecommended Chart: KPI Grid or Bar Chart
+Labels (4): Unpub/Ready, Unpub/Not Ready, Pub/Ready, Pub/Not Ready.
+Data Points: 35 ready, 10 not ready, 790 ready, 15 not ready.
+AI Insight: Critical attention is required for the 15 published courses marked "Not Ready," as students currently have access to incomplete instructional materials.
+1. Student Success
+2. Student OverviewRecommended Chart: KPI Grid (2x2)
+Labels (4): Total Students, Avg Course Score, Total Submissions, 30-Day Inactive.
+Data Points: 12,100 students, 77% score, 145k submissions, 312 inactive.
+AI Insight: Despite high submission volumes, a 77% average score indicates that while students are completing work, mastery levels are lower than the 80% institutional target.
+1. Students in Need of Attention (SINOA)Recommended Chart: Donut Proportion (360px) or Donut + Sub-account Breakdown (720px)
+Labels (5): Flagged Count, Total Enrolled, Courses Affected, Avg Flagged Score, No-Activity Count.
+Data Points: 452 flagged, 12.1k total, 88 courses, 52% avg score, 115 no-activity.
+AI Insight: The 4% of the student body currently flagged as "At-Risk" is concentrated within just 8% of total courses, suggesting localized curriculum challenges.
