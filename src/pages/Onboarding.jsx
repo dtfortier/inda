@@ -47,9 +47,9 @@ function AnalyticsIcon() {
   )
 }
 
-function InfoIcon() {
+function InfoIcon({ className = 'onboarding-info-icon' }) {
   return (
-    <svg className="onboarding-info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="12" r="10" />
       <path d="M12 16v-4" />
       <path d="M12 8h.01" />
@@ -255,6 +255,10 @@ function StepFocus({ focusAreas, toggleFocus, mode, stepNumber, stepCount }) {
 function ScopePicker({ field, selected, suggestedValues = [], onAdd, onRemove }) {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
+  /* Separate state + ref for the info popover so opening it doesn't
+     close the Add dropdown and vice versa. */
+  const [infoOpen, setInfoOpen] = useState(false)
+  const infoRef = useRef(null)
 
   useEffect(() => {
     if (!open) return
@@ -265,12 +269,43 @@ function ScopePicker({ field, selected, suggestedValues = [], onAdd, onRemove })
     return () => document.removeEventListener('mousedown', handler)
   }, [open])
 
+  useEffect(() => {
+    if (!infoOpen) return
+    const handler = (e) => {
+      if (infoRef.current && !infoRef.current.contains(e.target)) setInfoOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [infoOpen])
+
   const all = SCOPE_OPTIONS[field.key]
-  const available = all.filter((o) => !selected.includes(o))
+  /* `selected` is still an array of plain strings (the chosen values),
+     so we filter the {value, meta} option objects by their .value. */
+  const available = all.filter((o) => !selected.includes(o.value))
 
   return (
     <div className="scope-field">
-      <div className="scope-field-label">{field.label}</div>
+      <div className="scope-field-label">
+        <span>{field.label}</span>
+        {field.description && (
+          <span className="scope-info-popover" ref={infoRef}>
+            <button
+              type="button"
+              className="scope-info-btn"
+              onClick={() => setInfoOpen((v) => !v)}
+              aria-label={`About ${field.label}`}
+              aria-expanded={infoOpen}
+            >
+              <InfoIcon className="scope-info-icon" />
+            </button>
+            {infoOpen && (
+              <div className="scope-info-tooltip" role="dialog">
+                {field.description}
+              </div>
+            )}
+          </span>
+        )}
+      </div>
       <div className="scope-chips">
         {selected.map((value) => (
           <span key={value} className={`scope-chip${suggestedValues.includes(value) ? ' suggested' : ' added'}`}>
@@ -297,15 +332,18 @@ function ScopePicker({ field, selected, suggestedValues = [], onAdd, onRemove })
               ) : (
                 available.map((option) => (
                   <button
-                    key={option}
+                    key={option.value}
                     type="button"
                     className="scope-popover-item"
                     onClick={() => {
-                      onAdd(field.key, option)
+                      onAdd(field.key, option.value)
                       setOpen(false)
                     }}
                   >
-                    {option}
+                    <div className="scope-popover-item-name">{option.value}</div>
+                    {option.meta && (
+                      <div className="scope-popover-item-meta">{option.meta}</div>
+                    )}
                   </button>
                 ))
               )}
@@ -332,7 +370,7 @@ function StepScope({ scope, setScope, suggestedScope, mode, stepNumber, stepCoun
       <p className="onboarding-subtitle">
         {isAuto
           ? "Canvas pre-filled this based on your profile. Remove anything that doesn't apply, or add more."
-          : "Define your dashboard's scope. This applies to your entire dashboard."}
+          : "Define your dashboard's scope. This applies to your entire dashboard. You can update your scope anytime in Edit Dashboard, where you'll also find more detailed information about each option."}
       </p>
       {isAuto && (
         <div className="scope-legend">

@@ -345,6 +345,86 @@
   color: var(--color-text-muted);
   text-transform: uppercase;
   margin-bottom: 10px;
+  /* Lay out the label text + info icon as a row. */
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Info icon button sits inline with the field label. Click to open a
+   small popover describing what the field is for. */
+.scope-info-popover {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.scope-info-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.scope-info-btn:hover,
+.scope-info-btn:focus-visible {
+  color: var(--color-btn-primary-bg);
+  background: #eef4fd;
+  outline: none;
+}
+
+.scope-info-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.scope-info-tooltip {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 12px);
+  transform: translateY(-50%);
+  width: 280px;
+  padding: 12px 14px;
+  background: var(--color-bg-container);
+  border: 1px solid #e8eaec;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-elevation1);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+  line-height: 1.5;
+  color: var(--color-text-primary);
+  z-index: 25;
+}
+
+/* Two arrows: outer = border colour, inner (offset 1px) = fill, so
+   the arrow reads as one piece with the popover edge. */
+.scope-info-tooltip::before,
+.scope-info-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  border: 6px solid transparent;
+  border-right-color: #e8eaec;
+  margin-top: -6px;
+}
+
+.scope-info-tooltip::after {
+  border-width: 5px;
+  border-right-color: var(--color-bg-container);
+  margin-top: -5px;
+  margin-right: -1px;
 }
 
 .scope-chips {
@@ -490,7 +570,24 @@
 
 .scope-popover-item:hover {
   background: #eef4fd;
+}
+
+.scope-popover-item:hover .scope-popover-item-name {
   color: var(--color-btn-primary-bg);
+}
+
+.scope-popover-item-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  line-height: 1.35;
+}
+
+.scope-popover-item-meta {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+  line-height: 1.35;
 }
 
 .scope-popover-empty {
