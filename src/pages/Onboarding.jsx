@@ -369,7 +369,7 @@ function StepScope({ scope, setScope, suggestedScope, mode, stepNumber, stepCoun
       <h2 className="onboarding-title">{isAuto ? 'Confirm your scope' : 'Set your global scope'}</h2>
       <p className="onboarding-subtitle">
         {isAuto
-          ? "Canvas pre-filled this based on your profile. Remove anything that doesn't apply, or add more. This applies to your entire dashboard. You can update your scope anytime in Edit Dashboard, where you'll also find more detailed information about each option."
+          ? "Canvas pre-filled this based on your profile. Remove anything that doesn't apply, or add more."
           : "Define your dashboard's scope. This applies to your entire dashboard. You can update your scope anytime in Edit Dashboard, where you'll also find more detailed information about each option."}
       </p>
       {isAuto && (
@@ -501,8 +501,14 @@ export default function Onboarding({ onComplete, onEditDashboard, initialConfig 
 
   const flow = flowForMode(mode)
   const stepCount = flow.length
-  const currentKey = flow[step - 1] || flow[flow.length - 1]
-  const isLastStep = step === stepCount
+  /* `safeStep` clamps the rendered step to the current flow's length so
+     the wizard always shows a valid screen, even if `step` state lags
+     behind a flow change. Computing this during render (instead of in a
+     useEffect that calls setStep) avoids cascading renders — the React
+     hooks lint rule flags the effect-based pattern. */
+  const safeStep = Math.min(step, stepCount)
+  const currentKey = flow[safeStep - 1]
+  const isLastStep = safeStep === stepCount
 
   /* The analyzing animation and the focus recommendations are presented
      as a single logical step (step 2). Map internal flow positions to
@@ -539,11 +545,6 @@ export default function Onboarding({ onComplete, onEditDashboard, initialConfig 
   const handleEditDashboard = () => {
     if (onEditDashboard) onEditDashboard({ mode, focusAreas, scope })
   }
-
-  /* Clamp step when flow length changes (e.g. mode switched). */
-  useEffect(() => {
-    if (step > flow.length) setStep(flow.length)
-  }, [flow, step])
 
   /* When the analyzing step completes, apply recommendations and
      auto-advance to the next step (focus recommendations). */

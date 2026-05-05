@@ -1,0 +1,183 @@
+/* Scope summary card — sits above the widget grid on the dashboard.
+   Visual language matches the existing widget cards (white surface,
+   1px subtle border, soft shadow) and the onboarding scope chips. */
+.scope-summary {
+  background: var(--color-bg-container);
+  border: 1px solid #e8eaec;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-elevation1);
+  padding: 16px 20px;
+  font-family: var(--font-body);
+  color: var(--color-text-primary);
+  animation: scope-summary-fade-in 420ms ease-out both;
+}
+
+@keyframes scope-summary-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scope-summary { animation: none; }
+}
+
+/* ── Header row (always visible) ── */
+.scope-summary-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.scope-summary-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  background: #eef0f2;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.scope-summary-divider {
+  width: 1px;
+  height: 18px;
+  background: #c9ced3;
+}
+
+.scope-summary-line {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text-primary);
+}
+
+.scope-summary-part {
+  white-space: nowrap;
+}
+
+.scope-summary-sep {
+  color: var(--color-text-muted);
+  margin: 0 4px;
+}
+
+.scope-summary-toggle {
+  background: none;
+  border: none;
+  padding: 4px 8px;
+  margin: -4px -8px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-btn-primary-bg);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+}
+
+.scope-summary-toggle:hover {
+  text-decoration: underline;
+}
+
+.scope-summary-toggle:focus-visible {
+  outline: 2px solid var(--color-btn-primary-bg);
+  outline-offset: 2px;
+  text-decoration: none;
+}
+
+/* ── Expanded body ── */
+.scope-summary-rule {
+  height: 1px;
+  background: #e8eaec;
+  margin: 16px 0;
+}
+
+.scope-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px 32px;
+}
+
+.scope-summary-cell {
+  min-width: 0;
+}
+
+.scope-summary-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: 8px;
+}
+
+.scope-summary-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Read-only chip — same colour family as onboarding's added chip but
+   without the X-to-remove affordance. */
+.scope-summary-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  background: #d5e2f6;
+  border: 1px solid #d5e2f6;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-btn-primary-bg);
+  white-space: nowrap;
+}
+
+/* "+N more" overflow pill — dashed border, transparent fill so it reads
+   as a count rather than a selectable value. */
+.scope-summary-chip.more {
+  background: transparent;
+  border-style: dashed;
+  border-color: #aab3ba;
+  color: var(--color-text-muted);
+}
+
+/* ── Footer (expanded only) ── */
+.scope-summary-footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #e8eaec;
+}
+
+.scope-summary-hint {
+  flex: 1;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--color-text-muted);
+}
+
+/* ── Responsive ── */
+@media (max-width: 1023px) {
+  .scope-summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px 24px;
+  }
+}
+
+@media (max-width: 767px) {
+  .scope-summary {
+    padding: 14px 16px;
+  }
+  .scope-summary-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  .scope-summary-line {
+    font-size: 13px;
+  }
+}

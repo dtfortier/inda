@@ -67,6 +67,19 @@
   padding: 0 32px;
 }
 
+/* Wrapper around the ScopeSummary card so it aligns with .dashboard-content's
+   max-width and horizontal padding. The card itself has its own border and
+   padding; this wrapper just handles centering and breathing room. */
+.dashboard-scope-bar {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 32px 32px 0;
+}
+
+.dashboard-scope-bar + .dashboard-content {
+  padding-top: 24px;
+}
+
 /* Left column: large widgets */
 .dashboard-col-large {
   width: 800px;
@@ -102,6 +115,7 @@
 /* large: 1024–1199 — two columns, proportional */
 @media (max-width: 1199px) {
   .dashboard-content { padding: 0 24px; gap: 24px; }
+  .dashboard-scope-bar { padding: 24px 24px 0; }
   .dashboard-col-large {
     width: auto;
     max-width: none;
@@ -119,6 +133,7 @@
     gap: 24px;
     padding: 0 24px;
   }
+  .dashboard-scope-bar { padding: 24px 24px 0; }
   .dashboard-col-large,
   .dashboard-col-medium {
     width: 100%;
@@ -133,6 +148,7 @@
 @media (max-width: 767px) {
   .dashboard-body { padding: 0 0 var(--spacing-md); }
   .dashboard-content { padding: 0 16px; gap: 20px; }
+  .dashboard-scope-bar { padding: 16px 16px 0; }
   .dashboard-col-large,
   .dashboard-col-medium { gap: 20px; }
 }

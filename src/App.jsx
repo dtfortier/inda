@@ -65,7 +65,7 @@ function App() {
           />
         )}
         {view === 'customize' && <Customize onClose={handleCloseCustomize} />}
-        {view === 'dashboard' && <Dashboard />}
+        {view === 'dashboard' && <Dashboard config={config} />}
       </div>
     </div>
   )

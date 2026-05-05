@@ -2,6 +2,7 @@ import Highcharts from 'highcharts'
 import { HighchartsReact } from 'highcharts-react-official'
 import WidgetCard from '../components/widgets/WidgetCard.jsx'
 import KPIGrid from '../components/widgets/KPIGrid.jsx'
+import ScopeSummary from '../components/dashboard/ScopeSummary.jsx'
 import * as data from '../data/mock/widgetData.js'
 import * as modal from '../data/mock/modalEnrichments.js'
 import * as tables from '../data/mock/tableData.js'
@@ -223,10 +224,15 @@ function modalStackedBar100(categories, series) {
 
 /* ── Dashboard ── */
 
-export default function Dashboard() {
+export default function Dashboard({ config }) {
   return (
     <div className="dashboard-scroll">
       <div className="dashboard-body">
+        {config?.scope && (
+          <div className="dashboard-scope-bar">
+            <ScopeSummary scope={config.scope} />
+          </div>
+        )}
         <div className="dashboard-content">
           {/* Left column — large widgets */}
           <div className="dashboard-col-large">
