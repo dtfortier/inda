@@ -646,6 +646,9 @@
 
 .onboarding-footer-right {
   margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .onboarding-btn {

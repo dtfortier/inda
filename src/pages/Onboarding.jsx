@@ -369,7 +369,7 @@ function StepScope({ scope, setScope, suggestedScope, mode, stepNumber, stepCoun
       <h2 className="onboarding-title">{isAuto ? 'Confirm your scope' : 'Set your global scope'}</h2>
       <p className="onboarding-subtitle">
         {isAuto
-          ? "Canvas pre-filled this based on your profile. Remove anything that doesn't apply, or add more."
+          ? "Canvas pre-filled this based on your profile. Remove anything that doesn't apply, or add more. This applies to your entire dashboard. You can update your scope anytime in Edit Dashboard, where you'll also find more detailed information about each option."
           : "Define your dashboard's scope. This applies to your entire dashboard. You can update your scope anytime in Edit Dashboard, where you'll also find more detailed information about each option."}
       </p>
       {isAuto && (
@@ -434,7 +434,7 @@ function StepReview({ focusAreas, scope, stepNumber, stepCount }) {
 }
 
 /* ───────── MAIN ───────── */
-export default function Onboarding({ onComplete, initialConfig }) {
+export default function Onboarding({ onComplete, onEditDashboard, initialConfig }) {
   const [step, setStep] = useState(1)
   const [mode, setMode] = useState(initialConfig?.mode || 'manual')
   const [focusAreas, setFocusAreas] = useState(initialConfig?.focusAreas || [])
@@ -534,6 +534,12 @@ export default function Onboarding({ onComplete, initialConfig }) {
     }
   }
 
+  /* Step 4 only: persist the config and jump straight into Customize.
+     Used by the "Edit Dashboard" button next to "Save dashboard". */
+  const handleEditDashboard = () => {
+    if (onEditDashboard) onEditDashboard({ mode, focusAreas, scope })
+  }
+
   /* Clamp step when flow length changes (e.g. mode switched). */
   useEffect(() => {
     if (step > flow.length) setStep(flow.length)
@@ -597,6 +603,15 @@ export default function Onboarding({ onComplete, initialConfig }) {
             <span />
           )}
           <div className="onboarding-footer-right">
+            {currentKey === 'review' && (
+              <button
+                type="button"
+                className="onboarding-btn secondary"
+                onClick={handleEditDashboard}
+              >
+                Edit Dashboard
+              </button>
+            )}
             {currentKey !== 'analyzing' && (
               <button
                 type="button"
