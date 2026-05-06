@@ -91,49 +91,51 @@ export const SCOPE_OPTIONS = {
 /* Order here drives the order rendered on the scope step.
    `description` shows in the info popover next to each label. Keep the
    ending "Select one or more to..." consistent so popovers feel
-   parallel as the user scans through them. */
+   parallel as the user scans through them. The verbs vary slightly
+   ("limit", "filter", "narrow", "focus") to keep the copy from feeling
+   templated when you read it back-to-back. */
 export const SCOPE_FIELDS = [
   {
     key: 'subAccounts',
     label: 'Sub Accounts',
     description:
-      'Sub-accounts are the schools, colleges, or departments inside your institution. Select one or more to focus your dashboard on those areas.',
+      'Divisions or colleges within your institution, like College of Business or College of Arts. Select one or more to limit your dashboard to those areas.',
   },
   {
     key: 'term',
     label: 'Term',
     description:
-      'Terms are the academic periods you want to include, like Spring 2026 or Fall 2025. Select one or more to focus your dashboard on those terms.',
+      "The academic term or semester you want to focus on. Select one or more to filter your dashboard's data to that time period.",
   },
   {
     key: 'studentGroups',
     label: 'Student Groups',
     description:
-      'Student groups are populations defined in Canvas, like Student Athletes or First-generation Students. Select one or more to focus your dashboard on those students.',
+      'Groups of students your institution has defined, like first-gen students or student athletes. Select one or more to focus your dashboard on those students.',
   },
   {
     key: 'courses',
     label: 'Courses',
     description:
-      'Courses are individual sections offered in your sub-accounts. Select one or more to focus your dashboard on those courses.',
+      'Individual courses offered at your institution. Select one or more to narrow your dashboard to activity within those courses.',
   },
   {
     key: 'courseGroups',
     label: 'Course Groups',
     description:
-      'Course groups bundle courses by program, format, or campus. Select one or more to focus your dashboard on those courses.',
+      'Groups of courses your institution has defined, like independent study or South Campus courses. Select one or more to focus your dashboard on those courses.',
   },
   {
     key: 'instructors',
     label: 'Instructors',
     description:
-      'Instructors are the faculty teaching the courses you track. Select one or more to focus your dashboard on those instructors.',
+      'The instructors teaching at your institution. Select one or more to focus your dashboard on activity within their courses.',
   },
   {
     key: 'modality',
     label: 'Modality',
     description:
-      'Modality is how a course is delivered — in person, online, or hybrid. Select one or more to focus your dashboard on those formats.',
+      'How a course is delivered — in person, online, or hybrid. Select one or more to focus your dashboard on those formats.',
   },
 ]
 

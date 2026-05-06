@@ -141,6 +141,21 @@
   opacity: 0.85;
 }
 
+/* Tertiary — outlined navy on white. Used by Cancel so the three
+   actions (Cancel, Edit Scope, Save changes) read as low / mid / high
+   intensity. */
+.customize-btn.tertiary {
+  background: var(--color-bg-container);
+  border-color: #c7cdd1;
+  color: var(--color-text-primary);
+}
+
+.customize-btn.tertiary:hover {
+  background: #f3f5f7;
+  border-color: var(--color-btn-primary-bg);
+  color: var(--color-btn-primary-bg);
+}
+
 /* Body: canvas + sidebar */
 .customize-body {
   display: flex;

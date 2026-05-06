@@ -52,6 +52,17 @@ function App() {
   const handleCustomize = () => setView('customize')
   const handleCloseCustomize = () => setView('dashboard')
 
+  /* Called from the Edit Scope modal inside Customize. Merge the new
+     scope into the existing config and persist. The user stays in the
+     customize view — they can still tweak widgets after applying. */
+  const handleScopeChange = (newScope) => {
+    setConfig((prev) => {
+      const next = { ...(prev || {}), scope: newScope }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
+      return next
+    })
+  }
+
   return (
     <div className="app-shell">
       <Sidebar onHelp={handleOnboarding} />
@@ -64,7 +75,13 @@ function App() {
             initialConfig={config}
           />
         )}
-        {view === 'customize' && <Customize onClose={handleCloseCustomize} />}
+        {view === 'customize' && (
+          <Customize
+            onClose={handleCloseCustomize}
+            config={config}
+            onScopeChange={handleScopeChange}
+          />
+        )}
         {view === 'dashboard' && <Dashboard config={config} />}
       </div>
     </div>

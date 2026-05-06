@@ -1,0 +1,468 @@
+/* ── Backdrop & dialog ── */
+.editscope-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(35, 68, 101, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: editscope-fade 180ms ease-out both;
+}
+
+@keyframes editscope-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes editscope-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.editscope-modal {
+  background: var(--color-bg-container);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 720px;
+  max-height: calc(100vh - 48px);
+  display: flex;
+  flex-direction: column;
+  box-shadow:
+    0 12px 32px rgba(35, 68, 101, 0.18),
+    0 4px 8px rgba(35, 68, 101, 0.10);
+  animation: editscope-rise 220ms ease-out both;
+  overflow: hidden;
+  font-family: var(--font-body);
+  color: var(--color-text-primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .editscope-backdrop, .editscope-modal { animation: none; }
+}
+
+/* ── Header (sticky-ish via flex layout) ── */
+.editscope-header {
+  padding: 28px 32px 20px;
+  border-bottom: 1px solid #e8eaec;
+  flex-shrink: 0;
+}
+
+.editscope-title {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 8px;
+  color: var(--color-text-primary);
+}
+
+.editscope-subtitle {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.editscope-inline-info {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  width: 14px;
+  height: 14px;
+  color: var(--color-text-muted);
+}
+
+.editscope-inline-info svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ── Body (the only scrolling region) ── */
+.editscope-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 24px 32px 24px;
+}
+
+/* ── Legend ── */
+.editscope-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.editscope-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.editscope-legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-btn-primary-bg);
+}
+
+.editscope-legend-dot.suggested {
+  background: #b3c8e8;
+  border-color: #8fb0d9;
+}
+
+.editscope-legend-dot.added {
+  background: transparent;
+}
+
+/* ── Field row ── */
+.editscope-field {
+  padding: 16px 0;
+  border-top: 1px solid #e8eaec;
+}
+
+.editscope-field:first-of-type {
+  border-top: none;
+  padding-top: 0;
+}
+
+.editscope-field-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: 10px;
+}
+
+/* ── Info icon button + popover ── */
+.editscope-info-popover {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.editscope-info-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.editscope-info-btn:hover,
+.editscope-info-btn:focus-visible {
+  color: var(--color-btn-primary-bg);
+  background: #eef4fd;
+  outline: none;
+}
+
+.editscope-info-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.editscope-info-tooltip {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 12px);
+  transform: translateY(-50%);
+  width: 280px;
+  padding: 12px 14px;
+  background: var(--color-bg-container);
+  border: 1px solid #e8eaec;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-elevation1);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+  line-height: 1.5;
+  color: var(--color-text-primary);
+  z-index: 5;
+}
+
+.editscope-info-tooltip::before,
+.editscope-info-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  border: 6px solid transparent;
+  border-right-color: #e8eaec;
+  margin-top: -6px;
+}
+
+.editscope-info-tooltip::after {
+  border-width: 5px;
+  border-right-color: var(--color-bg-container);
+  margin-top: -5px;
+  margin-right: -1px;
+}
+
+/* ── Chips ── */
+.editscope-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.editscope-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px 5px 14px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.25;
+  border: 1px solid transparent;
+  transition: opacity 120ms ease;
+}
+
+/* Suggested by Canvas — filled blue */
+.editscope-chip.suggested {
+  background: #d5e2f6;
+  border-color: #d5e2f6;
+  color: var(--color-btn-primary-bg);
+}
+
+/* Added manually — outlined */
+.editscope-chip.added {
+  background: transparent;
+  border-color: var(--color-btn-primary-bg);
+  color: var(--color-btn-primary-bg);
+}
+
+/* Pending removal — strikethrough + dimmed. Whole chip becomes a
+   restore affordance. */
+.editscope-chip.removed {
+  opacity: 0.55;
+  cursor: pointer;
+}
+
+.editscope-chip.removed .editscope-chip-label {
+  text-decoration: line-through;
+}
+
+.editscope-chip.removed:hover {
+  opacity: 0.85;
+}
+
+.editscope-chip-label {
+  white-space: nowrap;
+}
+
+.editscope-chip-action {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+  cursor: pointer;
+}
+
+.editscope-chip-action:hover {
+  background: rgba(35, 68, 101, 0.10);
+}
+
+/* ── Add button + popover (matches the onboarding scope-popover but
+   namespaced to the modal so styles can drift independently). ── */
+.editscope-add-popover {
+  position: relative;
+  display: inline-block;
+}
+
+.editscope-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: transparent;
+  border: 1px dashed var(--color-btn-primary-bg);
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-btn-primary-bg);
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+
+.editscope-add:hover {
+  background: #eef4fd;
+}
+
+.editscope-add-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 280px;
+  max-height: 280px;
+  overflow-y: auto;
+  background: var(--color-bg-container);
+  border: 1px solid #e8eaec;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-elevation1);
+  padding: 6px;
+  z-index: 10;
+}
+
+.editscope-add-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 14px;
+  border: none;
+  background: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+
+.editscope-add-item:hover {
+  background: #eef4fd;
+}
+
+.editscope-add-item:hover .editscope-add-item-name {
+  color: var(--color-btn-primary-bg);
+}
+
+.editscope-add-item-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  line-height: 1.35;
+}
+
+.editscope-add-item-meta {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+  line-height: 1.35;
+}
+
+.editscope-add-empty {
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+/* ── Affected-widget warning banner ── */
+.editscope-warning {
+  margin-top: 16px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #fffbe6;
+  border: 1px solid #f5e6a8;
+  border-radius: var(--radius-md);
+  color: #8a6a00;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.editscope-warning svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: #b88600;
+}
+
+/* ── Footer ── */
+.editscope-footer {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 32px;
+  border-top: 1px solid #e8eaec;
+  background: var(--color-bg-container);
+}
+
+.editscope-footer-hint {
+  flex: 1;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--color-text-muted);
+}
+
+.editscope-footer-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.editscope-btn {
+  height: 40px;
+  padding: 0 16px;
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.25;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: opacity 0.15s, background 0.15s;
+}
+
+.editscope-btn.primary {
+  background: var(--color-btn-primary-bg);
+  border-color: var(--color-btn-primary-bg);
+  color: var(--color-btn-primary-text);
+}
+
+.editscope-btn.primary:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.editscope-btn.primary:disabled {
+  cursor: progress;
+  opacity: 0.85;
+}
+
+.editscope-btn.tertiary {
+  background: var(--color-bg-container);
+  border-color: #c7cdd1;
+  color: var(--color-text-primary);
+}
+
+.editscope-btn.tertiary:hover:not(:disabled) {
+  background: #f3f5f7;
+  border-color: var(--color-btn-primary-bg);
+  color: var(--color-btn-primary-bg);
+}
+
+.editscope-btn:disabled {
+  cursor: not-allowed;
+}
+
+/* ── Responsive ── */
+@media (max-width: 767px) {
+  .editscope-backdrop { padding: 16px; }
+  .editscope-header { padding: 20px 20px 16px; }
+  .editscope-body { padding: 16px 20px; }
+  .editscope-footer { padding: 14px 20px; flex-wrap: wrap; }
+  .editscope-footer-hint { width: 100%; }
+  .editscope-info-tooltip { width: 240px; }
+}

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import EditScopeModal from '../components/dashboard/EditScopeModal.jsx'
 import './Customize.css'
 
 const WIDGET_CATALOG = {
@@ -396,7 +397,14 @@ export function CustomizeBoard({ initialLayout }) {
   )
 }
 
-export default function Customize({ onClose }) {
+export default function Customize({ onClose, config, onScopeChange }) {
+  const [isEditScopeOpen, setEditScopeOpen] = useState(false)
+
+  const handleApplyScope = (newScope) => {
+    if (onScopeChange) onScopeChange(newScope)
+    setEditScopeOpen(false)
+  }
+
   return (
     <div className="customize-frame">
       <div className="customize-header">
@@ -407,11 +415,26 @@ export default function Customize({ onClose }) {
           </p>
         </div>
         <div className="customize-actions">
-          <button type="button" className="customize-btn secondary" onClick={onClose}>Cancel</button>
+          <button type="button" className="customize-btn tertiary" onClick={onClose}>Cancel</button>
+          <button
+            type="button"
+            className="customize-btn secondary"
+            onClick={() => setEditScopeOpen(true)}
+          >
+            Edit Scope
+          </button>
           <button type="button" className="customize-btn primary" onClick={onClose}>Save changes</button>
         </div>
       </div>
       <CustomizeBoard />
+
+      <EditScopeModal
+        isOpen={isEditScopeOpen}
+        currentScope={config?.scope}
+        mode={config?.mode}
+        onApply={handleApplyScope}
+        onCancel={() => setEditScopeOpen(false)}
+      />
     </div>
   )
 }
