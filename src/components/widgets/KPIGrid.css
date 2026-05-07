@@ -54,3 +54,11 @@
   margin: 0;
   white-space: nowrap;
 }
+
+/* Status badge sits between value and description; small top margin
+   for breathing room. The badge component is inline-flex so the row
+   hugs its content. */
+.kpi-status {
+  margin-top: 6px;
+  margin-bottom: 2px;
+}

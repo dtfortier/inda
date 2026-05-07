@@ -1,0 +1,48 @@
+.metric-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  line-height: 1.2;
+}
+
+.metric-status-badge svg {
+  flex-shrink: 0;
+}
+
+/* On Target — outlined green. The "we're meeting our goal" maintenance
+   state. Lighter than goal-met to keep the badge from feeling like a
+   one-off achievement. */
+.metric-status-badge.success-soft {
+  background: #e8f5ec;
+  border-color: #b6dcc1;
+  color: #1f7a3e;
+}
+
+/* Goal Met — solid green. For explicit goal-achievement events. */
+.metric-status-badge.success {
+  background: #1f7a3e;
+  border-color: #1f7a3e;
+  color: #ffffff;
+}
+
+/* At Risk — warm amber. Caution, not alarm. */
+.metric-status-badge.warning {
+  background: #fff4d6;
+  border-color: #f5d68a;
+  color: #8a6a00;
+}
+
+/* Below Threshold — red, but soft fill so it doesn't read as an error. */
+.metric-status-badge.danger {
+  background: #fdecea;
+  border-color: #f5b7b1;
+  color: #b03a2e;
+}

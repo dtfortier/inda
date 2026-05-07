@@ -1,0 +1,233 @@
+/* ── Dashboard Switcher — shared root ───────────────────────── */
+
+.ds-root {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+}
+
+/* ── Single-dashboard state ─────────────────────────────────── */
+
+.ds-root--single {
+  animation: ds-fade-in 0.25s ease;
+}
+
+.ds-title-static {
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--color-topbar-text, #1a1f36);
+  white-space: nowrap;
+}
+
+/* Tertiary text button: "+ Create new dashboard" */
+.ds-create-text-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border: 1.5px solid rgba(14, 31, 91, 0.22);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-topbar-text, #1a1f36);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 500;
+  opacity: 0.72;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.ds-create-text-btn:hover {
+  opacity: 1;
+  border-color: var(--color-btn-primary-bg, #0e1f5b);
+  background: rgba(14, 31, 91, 0.05);
+}
+
+.ds-create-text-btn:focus-visible {
+  outline: 2px solid var(--color-btn-primary-bg, #0e1f5b);
+  outline-offset: 2px;
+}
+
+/* ── Multi-dashboard switcher state ─────────────────────────── */
+
+.ds-root--multi {
+  animation: ds-morph-in 0.3s ease;
+}
+
+/* Trigger button — looks like the page title, not a heavy CTA */
+.ds-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 4px 6px;
+  margin: -4px -6px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  color: inherit;
+  transition: background 0.15s;
+}
+
+.ds-trigger:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.ds-trigger:focus-visible {
+  outline: 2px solid var(--color-btn-primary-bg, #0e1f5b);
+  outline-offset: 2px;
+}
+
+.ds-trigger-label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--color-topbar-text, #1a1f36);
+  white-space: nowrap;
+}
+
+.ds-chevron {
+  color: var(--color-topbar-text, #1a1f36);
+  opacity: 0.6;
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.ds-chevron.open {
+  transform: rotate(180deg);
+}
+
+/* Dropdown panel */
+.ds-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 240px;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06);
+  z-index: 200;
+  overflow: hidden;
+  animation: ds-drop-in 0.15s ease;
+}
+
+.ds-section-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: #8a94a6;
+  padding: 10px 14px 6px;
+}
+
+.ds-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 6px;
+}
+
+.ds-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  background: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.875rem;
+  color: #1a1f36;
+  text-align: left;
+  transition: background 0.12s;
+  gap: 8px;
+}
+
+.ds-item:hover {
+  background: #f4f6fb;
+}
+
+.ds-item.active {
+  background: #eef1fa;
+  font-weight: 500;
+}
+
+.ds-item-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ds-item-check {
+  color: var(--color-btn-primary-bg, #0e1f5b);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.ds-divider {
+  height: 1px;
+  background: rgba(0, 0, 0, 0.08);
+  margin: 6px 0;
+}
+
+.ds-actions {
+  padding: 0 6px 6px;
+}
+
+.ds-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  background: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.875rem;
+  color: #1a1f36;
+  text-align: left;
+  transition: background 0.12s;
+}
+
+.ds-action-btn:hover {
+  background: #f4f6fb;
+}
+
+.ds-action-icon {
+  display: flex;
+  align-items: center;
+  color: #8a94a6;
+  flex-shrink: 0;
+}
+
+/* ── Animations ─────────────────────────────────────────────── */
+
+/* Single → mount */
+@keyframes ds-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Single → multi morph: slides in slightly from left and fades */
+@keyframes ds-morph-in {
+  from { opacity: 0; transform: translateX(-6px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Dropdown open */
+@keyframes ds-drop-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

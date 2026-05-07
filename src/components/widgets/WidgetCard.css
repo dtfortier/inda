@@ -144,6 +144,105 @@
   height: 20px;
 }
 
+/* ── Edit-mode chrome ── */
+
+/* In edit mode the whole card becomes a drag target. The dashed border
+   echoes the library's draggable items so the affordance is consistent. */
+.widget-card.edit-mode {
+  border: 2px dashed #aab3ba;
+  cursor: grab;
+  position: relative;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+
+.widget-card.edit-mode:hover {
+  border-color: var(--color-btn-primary-bg);
+  box-shadow: var(--shadow-elevation1);
+}
+
+.widget-card.edit-mode:active {
+  cursor: grabbing;
+}
+
+.widget-card.edit-mode.is-dragging {
+  opacity: 0.35;
+}
+
+/* Drop-position indicator — a 4px navy bar above or below the card
+   when something is being dragged into that slot. */
+.widget-card.edit-mode.drop-before::before,
+.widget-card.edit-mode.drop-after::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--color-btn-primary-bg);
+  border-radius: 2px;
+}
+
+.widget-card.edit-mode.drop-before::before { top: -14px; }
+.widget-card.edit-mode.drop-after::after  { bottom: -14px; }
+
+/* Grip handle — left of the title text. Kept subtle so it doesn't
+   distract from the actual content. */
+.widget-grip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  margin-top: 2px;
+  margin-right: 8px;
+  color: var(--color-text-muted);
+}
+
+/* Remove (X) button — replaces the kebab menu in edit mode. */
+.widget-remove-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  transition: background 0.12s, color 0.12s;
+}
+
+.widget-remove-btn:hover {
+  background: #f1f5f9;
+  color: #c0392b;
+}
+
+/* Edit-widget button — lighter visual weight than "Dive deeper" so it
+   doesn't compete with the chart, but obvious enough to find. */
+.widget-edit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px;
+  background: #d5e2f6;
+  border: 1px solid #d5e2f6;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.25;
+  color: var(--color-btn-primary-bg);
+  transition: opacity 0.15s;
+}
+
+.widget-edit-btn:hover {
+  opacity: 0.9;
+}
+
 /* ── Responsive ── */
 @media (max-width: 1023px) {
   .widget-title { font-size: 22px; }
@@ -154,6 +253,7 @@
   .widget-inner { padding: var(--spacing-md); gap: var(--spacing-md); }
   .widget-title { font-size: 20px; }
   .widget-view-details { font-size: 14px; padding: 0 var(--spacing-md); height: 36px; }
+  .widget-edit-btn { font-size: 13px; padding: 0 12px; height: 32px; }
   .widget-insight { padding: var(--spacing-sm) var(--spacing-md); }
   .widget-insight-text { font-size: 13px; }
 }

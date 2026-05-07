@@ -1,124 +1,9 @@
 import { useState } from 'react'
 import EditScopeModal from '../components/dashboard/EditScopeModal.jsx'
+import EditWidgetModal from '../components/widgets/EditWidgetModal.jsx'
+import { renderRegistryWidget } from './Dashboard.jsx'
+import { WIDGET_REGISTRY, DEFAULT_LAYOUT } from '../data/widgetRegistry.jsx'
 import './Customize.css'
-
-const WIDGET_CATALOG = {
-  'inst-snap':         { title: 'Institution Snapshot',          type: 'KPI metrics',    desc: 'Top-line institutional KPIs: enrollment, activity rate, and overall health.' },
-  'sub-health':        { title: 'Sub-Account Health',            type: 'Bar chart',      desc: 'Low-engagement percentage for each sub-account, ranked worst to best.' },
-  'course-status':     { title: 'Course Status',                 type: 'Stacked bar',    desc: 'Published vs. unpublished vs. concluded courses across the term.' },
-  'lti-adoption-lg':   { title: 'LTI Adoption',                  type: 'Horizontal bar', desc: 'Which external tools are used most — total launches and unique users.' },
-  'course-perf':       { title: 'Course Performance',            type: 'Line chart',     desc: 'Weekly participation trend across all courses — spot dips early.' },
-  'interaction':       { title: 'Interaction Over Time',         type: 'Line chart',     desc: 'Weekly participation rate alongside total page-view volume.' },
-  'course-readiness':  { title: 'Course Readiness',              type: 'Stacked bar',    desc: 'Share of courses ready to launch vs. missing setup essentials.' },
-  'students-need':     { title: 'Students in Need of Attention', type: 'Donut chart',    desc: 'Count of flagged students, surfacing who needs intervention now.' },
-  'student-overview':  { title: 'Student Overview',              type: 'KPI metrics',    desc: 'High-level student stats: active, at-risk, and inactive counts.' },
-  'faculty':           { title: 'Faculty Engagement',            type: 'Scored bars',    desc: 'Faculty activity score by department — coursework, grading, feedback.' },
-  'course-metrics':    { title: 'Course Metrics',                type: 'KPI metrics',    desc: 'Quick course-level stats: size, pacing, completion, and grade spread.' },
-  'grade-dist':        { title: 'Grade Distribution',            type: 'Bar chart',      desc: 'Distribution of final grades across all active courses.' },
-  'assign-completion': { title: 'Assignment Completion',         type: 'Donut chart',    desc: 'Ratio of assignments submitted on time vs. late vs. missing.' },
-  'login-activity':    { title: 'Login Activity',                type: 'Line chart',     desc: 'Daily login counts — track engagement patterns over the term.' },
-  'discussion':        { title: 'Discussion Engagement',         type: 'KPI metrics',    desc: 'Posts, replies, and unique participants in course discussions.' },
-}
-
-const INITIAL_LAYOUT = {
-  left: [
-    { id: 'inst-snap',        size: 'full' },
-    { id: 'sub-health',       size: 'full' },
-    { id: 'course-status',    size: 'full' },
-    { id: 'lti-adoption-lg',  size: 'half' },
-    { id: 'course-perf',      size: 'half' },
-    { id: 'interaction',      size: 'full' },
-    { id: 'course-readiness', size: 'full' },
-  ],
-  right: [
-    { id: 'students-need' },
-    { id: 'student-overview' },
-    { id: 'faculty' },
-    { id: 'course-metrics' },
-  ],
-}
-
-/* ── skeleton sparklines (re-used as the "chart" placeholder) ── */
-const SKEL = {
-  'KPI metrics': (
-    <svg viewBox="0 0 400 120" fill="none">
-      {[0, 1, 2, 3].map((i) => (
-        <g key={i}>
-          <rect x={20 + i * 95} y="24" width="70" height="12" rx="3" fill="currentColor" opacity="0.18" />
-          <rect x={20 + i * 95} y="44" width="55" height="28" rx="4" fill="currentColor" opacity="0.35" />
-          <rect x={20 + i * 95} y="82" width="75" height="8" rx="2" fill="currentColor" opacity="0.15" />
-        </g>
-      ))}
-    </svg>
-  ),
-  'Bar chart': (
-    <svg viewBox="0 0 400 160" fill="none">
-      {Array.from({ length: 10 }, (_, i) => {
-        const h = [70, 90, 60, 110, 80, 125, 55, 95, 70, 105][i]
-        return <rect key={i} x={20 + i * 38} y={140 - h} width="24" height={h} rx="2" fill="currentColor" opacity="0.4" />
-      })}
-    </svg>
-  ),
-  'Stacked bar': (
-    <svg viewBox="0 0 400 160" fill="none">
-      {Array.from({ length: 8 }, (_, i) => {
-        const a = [40, 60, 30, 70, 50, 55, 45, 65][i]
-        const b = [50, 40, 55, 35, 45, 60, 50, 40][i]
-        return (
-          <g key={i}>
-            <rect x={30 + i * 46} y={140 - a - b} width="28" height={b} fill="currentColor" opacity="0.5" />
-            <rect x={30 + i * 46} y={140 - a} width="28" height={a} fill="currentColor" opacity="0.25" />
-          </g>
-        )
-      })}
-    </svg>
-  ),
-  'Horizontal bar': (
-    <svg viewBox="0 0 400 160" fill="none">
-      {Array.from({ length: 6 }, (_, i) => {
-        const w = [260, 200, 310, 160, 240, 190][i]
-        return <rect key={i} x="20" y={18 + i * 22} width={w} height="12" rx="3" fill="currentColor" opacity="0.4" />
-      })}
-    </svg>
-  ),
-  'Line chart': (
-    <svg viewBox="0 0 400 160" fill="none">
-      <polyline
-        points="10,120 50,95 90,110 130,70 170,85 210,45 250,60 290,30 330,55 370,25"
-        stroke="currentColor"
-        strokeWidth="2.5"
-        fill="none"
-        opacity="0.55"
-      />
-      <polyline
-        points="10,135 50,125 90,130 130,100 170,110 210,85 250,90 290,75 330,70 370,60"
-        stroke="currentColor"
-        strokeWidth="2"
-        fill="none"
-        opacity="0.3"
-      />
-    </svg>
-  ),
-  'Donut chart': (
-    <svg viewBox="0 0 400 180" fill="none">
-      <circle cx="200" cy="90" r="60" stroke="currentColor" strokeWidth="18" fill="none" opacity="0.18" />
-      <path d="M 200 30 A 60 60 0 0 1 252 108" stroke="currentColor" strokeWidth="18" fill="none" opacity="0.55" />
-    </svg>
-  ),
-  'Scored bars': (
-    <svg viewBox="0 0 400 180" fill="none">
-      {Array.from({ length: 5 }, (_, i) => {
-        const w = [280, 220, 310, 180, 250][i]
-        return (
-          <g key={i}>
-            <rect x="20" y={16 + i * 30} width="360" height="10" rx="3" fill="currentColor" opacity="0.12" />
-            <rect x="20" y={16 + i * 30} width={w} height="10" rx="3" fill="currentColor" opacity="0.5" />
-          </g>
-        )
-      })}
-    </svg>
-  ),
-}
 
 function GripIcon() {
   return (
@@ -133,47 +18,14 @@ function GripIcon() {
   )
 }
 
-function XIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M18 6 6 18" />
-      <path d="m6 6 12 12" />
-    </svg>
-  )
-}
-
-function WidgetSkeleton({ id, sizeClass, dragging, dropBefore, dropAfter, onRemove, draggableProps }) {
-  const spec = WIDGET_CATALOG[id]
-  if (!spec) return null
-  return (
-    <div
-      className={`skel-card ${sizeClass}${dragging ? ' is-dragging' : ''}${dropBefore ? ' drop-before' : ''}${dropAfter ? ' drop-after' : ''}`}
-      {...draggableProps}
-    >
-      <div className="skel-head">
-        <div className="skel-title-block">
-          <div className="skel-grip"><GripIcon /></div>
-          <div className="skel-title-text">
-            <h3 className="skel-title">{spec.title}</h3>
-            <div className="skel-type">{spec.type}</div>
-            {spec.desc && <div className="skel-desc">{spec.desc}</div>}
-          </div>
-        </div>
-        {onRemove && (
-          <button type="button" className="skel-remove" onClick={onRemove} aria-label="Remove widget">
-            <XIcon />
-          </button>
-        )}
-      </div>
-      <div className="skel-body">{SKEL[spec.type] || SKEL['KPI metrics']}</div>
-    </div>
-  )
-}
-
-export function CustomizeBoard({ initialLayout }) {
-  const [layout, setLayout] = useState(initialLayout || INITIAL_LAYOUT)
-  const [drag, setDrag] = useState(null) // { source, id, index, position }
-  const [over, setOver] = useState(null) // { column, index, position: 'before'|'after' }
+/* CustomizeBoard now renders real WidgetCard instances using the
+   shared registry, in edit mode. The drag-and-drop logic stays the
+   same; we just pass the drag handlers to WidgetCard instead of the
+   old WidgetSkeleton. */
+export function CustomizeBoard({ initialLayout, onEditWidget, monitoring }) {
+  const [layout, setLayout] = useState(initialLayout || DEFAULT_LAYOUT)
+  const [drag, setDrag] = useState(null)
+  const [over, setOver] = useState(null)
 
   const startDrag = (source, id, index) => (e) => {
     setDrag({ source, id, index })
@@ -197,8 +49,7 @@ export function CustomizeBoard({ initialLayout }) {
 
   const onColumnDragOver = (column) => (e) => {
     if (!drag) return
-    // only engage if not over a specific card already
-    if (e.target.closest('.skel-card')) return
+    if (e.target.closest('.widget-card')) return
     e.preventDefault()
     e.dataTransfer.dropEffect = 'move'
     setOver({ column, index: layout[column].length, position: 'before' })
@@ -211,8 +62,14 @@ export function CustomizeBoard({ initialLayout }) {
     const { column: dstCol, index: dstIdx, position } = over
     let insertAt = position === 'before' ? dstIdx : dstIdx + 1
 
-    const next = { left: [...layout.left], right: [...layout.right] }
-    const entryFor = (wid) => (dstCol === 'left' ? { id: wid, size: 'full' } : { id: wid })
+    const next = { large: [...layout.large], medium: [...layout.medium] }
+    const entryFor = (wid) => {
+      const def = WIDGET_REGISTRY[wid]
+      if (dstCol === 'large') {
+        return { id: wid, size: def?.defaultSize || 'full' }
+      }
+      return { id: wid }
+    }
 
     if (source === 'library') {
       next[dstCol].splice(insertAt, 0, entryFor(id))
@@ -220,7 +77,7 @@ export function CustomizeBoard({ initialLayout }) {
       if (source === dstCol) {
         const [moved] = next[source].splice(srcIdx, 1)
         if (srcIdx < insertAt) insertAt -= 1
-        const normalized = dstCol === 'left' && !moved.size ? { ...moved, size: 'full' } : moved
+        const normalized = dstCol === 'large' && !moved.size ? { ...moved, size: 'full' } : moved
         next[dstCol].splice(insertAt, 0, normalized)
       } else {
         const [moved] = next[source].splice(srcIdx, 1)
@@ -228,93 +85,79 @@ export function CustomizeBoard({ initialLayout }) {
       }
     }
 
-    // heal orphaned half-widgets in the left column
+    /* Heal orphaned half-widgets — a half can only sit beside another
+       half. If it ends up alone, promote it to full so the layout
+       doesn't have an awkward 50%-wide gap. */
     const healed = []
-    for (let i = 0; i < next.left.length; i++) {
-      const cur = next.left[i]
-      const nxt = next.left[i + 1]
+    for (let i = 0; i < next.large.length; i++) {
+      const cur = next.large[i]
+      const nxt = next.large[i + 1]
       if (cur.size === 'half' && (!nxt || nxt.size !== 'half')) {
         healed.push({ ...cur, size: 'full' })
       } else {
         healed.push(cur)
       }
     }
-    next.left = healed
+    next.large = healed
 
     setLayout(next)
     endDrag()
   }
 
   const removeFromColumn = (column, index) => () => {
-    const next = { left: [...layout.left], right: [...layout.right] }
+    const next = { large: [...layout.large], medium: [...layout.medium] }
     next[column].splice(index, 1)
     setLayout(next)
   }
 
-  /* ── render left column with pair awareness ── */
-  const renderLeftColumn = () => {
+  const renderEditableWidget = (column, item, index, sizeClass) => {
+    const dragging = drag?.source === column && drag?.index === index
+    const dropBefore = over?.column === column && over?.index === index && over?.position === 'before'
+    const dropAfter = over?.column === column && over?.index === index && over?.position === 'after'
+
+    /* sizeClass is applied via wrapper div so we don't need to add new
+       size variants to WidgetCard. The wrapper handles flex behavior;
+       the card fills it. */
+    return (
+      <div className={sizeClass} key={`${item.id}-${index}`}>
+        {renderRegistryWidget(item.id, {
+          monitoring,
+          editMode: true,
+          onEdit: () => onEditWidget?.(item.id),
+          onRemove: removeFromColumn(column, index),
+          draggable: true,
+          onDragStart: startDrag(column, item.id, index),
+          onDragOver: onCardDragOver(column, index),
+          onDrop: performDrop,
+          onDragEnd: endDrag,
+          isDragging: dragging,
+          dropBefore,
+          dropAfter,
+        })}
+      </div>
+    )
+  }
+
+  /* Render the large column, pairing adjacent halves into a
+     side-by-side row. */
+  const renderLargeColumn = () => {
     const out = []
     let i = 0
-    while (i < layout.left.length) {
-      const cur = layout.left[i]
-      const nxt = layout.left[i + 1]
+    while (i < layout.large.length) {
+      const cur = layout.large[i]
+      const nxt = layout.large[i + 1]
       if (cur.size === 'half' && nxt && nxt.size === 'half') {
         const iA = i
         const iB = i + 1
         out.push(
           <div className="widget-pair" key={`pair-${cur.id}-${nxt.id}-${iA}`}>
-            <WidgetSkeleton
-              id={cur.id}
-              sizeClass="skel-half"
-              dragging={drag?.source === 'left' && drag?.index === iA}
-              dropBefore={over?.column === 'left' && over?.index === iA && over?.position === 'before'}
-              dropAfter={over?.column === 'left' && over?.index === iA && over?.position === 'after'}
-              onRemove={removeFromColumn('left', iA)}
-              draggableProps={{
-                draggable: true,
-                onDragStart: startDrag('left', cur.id, iA),
-                onDragOver: onCardDragOver('left', iA),
-                onDrop: performDrop,
-                onDragEnd: endDrag,
-              }}
-            />
-            <WidgetSkeleton
-              id={nxt.id}
-              sizeClass="skel-half"
-              dragging={drag?.source === 'left' && drag?.index === iB}
-              dropBefore={over?.column === 'left' && over?.index === iB && over?.position === 'before'}
-              dropAfter={over?.column === 'left' && over?.index === iB && over?.position === 'after'}
-              onRemove={removeFromColumn('left', iB)}
-              draggableProps={{
-                draggable: true,
-                onDragStart: startDrag('left', nxt.id, iB),
-                onDragOver: onCardDragOver('left', iB),
-                onDrop: performDrop,
-                onDragEnd: endDrag,
-              }}
-            />
+            {renderEditableWidget('large', cur, iA, 'customize-half')}
+            {renderEditableWidget('large', nxt, iB, 'customize-half')}
           </div>
         )
         i += 2
       } else {
-        out.push(
-          <WidgetSkeleton
-            key={`${cur.id}-${i}`}
-            id={cur.id}
-            sizeClass="skel-full"
-            dragging={drag?.source === 'left' && drag?.index === i}
-            dropBefore={over?.column === 'left' && over?.index === i && over?.position === 'before'}
-            dropAfter={over?.column === 'left' && over?.index === i && over?.position === 'after'}
-            onRemove={removeFromColumn('left', i)}
-            draggableProps={{
-              draggable: true,
-              onDragStart: startDrag('left', cur.id, i),
-              onDragOver: onCardDragOver('left', i),
-              onDrop: performDrop,
-              onDragEnd: endDrag,
-            }}
-          />
-        )
+        out.push(renderEditableWidget('large', cur, i, 'customize-full'))
         i += 1
       }
     }
@@ -323,95 +166,84 @@ export function CustomizeBoard({ initialLayout }) {
 
   return (
     <div className="customize-body">
-        <div className="customize-canvas">
-          <div className="dashboard-content">
-            <div
-              className="dashboard-col-large"
-              onDragOver={onColumnDragOver('left')}
-              onDrop={performDrop}
-            >
-              {renderLeftColumn()}
-            </div>
-            <div
-              className="dashboard-col-medium"
-              onDragOver={onColumnDragOver('right')}
-              onDrop={performDrop}
-            >
-              {layout.right.map((w, i) => (
-                <WidgetSkeleton
-                  key={`${w.id}-${i}`}
-                  id={w.id}
-                  sizeClass="skel-medium"
-                  dragging={drag?.source === 'right' && drag?.index === i}
-                  dropBefore={over?.column === 'right' && over?.index === i && over?.position === 'before'}
-                  dropAfter={over?.column === 'right' && over?.index === i && over?.position === 'after'}
-                  onRemove={removeFromColumn('right', i)}
-                  draggableProps={{
-                    draggable: true,
-                    onDragStart: startDrag('right', w.id, i),
-                    onDragOver: onCardDragOver('right', i),
-                    onDrop: performDrop,
-                    onDragEnd: endDrag,
-                  }}
-                />
-              ))}
-            </div>
+      <div className="customize-canvas">
+        <div className="dashboard-content">
+          <div
+            className="dashboard-col-large"
+            onDragOver={onColumnDragOver('large')}
+            onDrop={performDrop}
+          >
+            {renderLargeColumn()}
+          </div>
+          <div
+            className="dashboard-col-medium"
+            onDragOver={onColumnDragOver('medium')}
+            onDrop={performDrop}
+          >
+            {layout.medium.map((w, i) => renderEditableWidget('medium', w, i, 'customize-medium'))}
           </div>
         </div>
-
-        <aside className="customize-library">
-          <div className="customize-library-header">
-            <div className="customize-library-title">Widget library</div>
-            <div className="customize-library-hint">Drag onto the dashboard to add</div>
-          </div>
-          <div className="customize-library-list">
-            {(() => {
-              const placed = new Set([
-                ...layout.left.map((w) => w.id),
-                ...layout.right.map((w) => w.id),
-              ])
-              const available = Object.entries(WIDGET_CATALOG).filter(([id]) => !placed.has(id))
-              if (available.length === 0) {
-                return <div className="customize-library-empty">All widgets placed on the dashboard.</div>
-              }
-              return available.map(([id, spec]) => (
-                <div
-                  key={id}
-                  className="library-item"
-                  draggable
-                  onDragStart={startDrag('library', id, null)}
-                  onDragEnd={endDrag}
-                >
-                  <div className="library-item-icon"><GripIcon /></div>
-                  <div className="library-item-body">
-                    <div className="library-item-title">{spec.title}</div>
-                    <div className="library-item-type">{spec.type}</div>
-                    {spec.desc && <div className="library-item-desc">{spec.desc}</div>}
-                  </div>
-                </div>
-              ))
-            })()}
-          </div>
-        </aside>
       </div>
+
+      <aside className="customize-library">
+        <div className="customize-library-header">
+          <div className="customize-library-title">Widget library</div>
+          <div className="customize-library-hint">Drag onto the dashboard to add</div>
+        </div>
+        <div className="customize-library-list">
+          {(() => {
+            const placed = new Set([
+              ...layout.large.map((w) => w.id),
+              ...layout.medium.map((w) => w.id),
+            ])
+            const available = Object.entries(WIDGET_REGISTRY).filter(([id]) => !placed.has(id))
+            if (available.length === 0) {
+              return <div className="customize-library-empty">All widgets placed on the dashboard.</div>
+            }
+            return available.map(([id, spec]) => (
+              <div
+                key={id}
+                className="library-item"
+                draggable
+                onDragStart={startDrag('library', id, null)}
+                onDragEnd={endDrag}
+              >
+                <div className="library-item-icon"><GripIcon /></div>
+                <div className="library-item-body">
+                  <div className="library-item-title">{spec.title}</div>
+                  <div className="library-item-type">{spec.type}</div>
+                  {spec.description && <div className="library-item-desc">{spec.description}</div>}
+                </div>
+              </div>
+            ))
+          })()}
+        </div>
+      </aside>
+    </div>
   )
 }
 
-export default function Customize({ onClose, config, onScopeChange }) {
+export default function Customize({ onClose, config, onScopeChange, onMonitoringChange }) {
   const [isEditScopeOpen, setEditScopeOpen] = useState(false)
+  const [editingWidgetId, setEditingWidgetId] = useState(null)
 
   const handleApplyScope = (newScope) => {
     if (onScopeChange) onScopeChange(newScope)
     setEditScopeOpen(false)
   }
 
+  const handleSaveMonitoring = (widgetId, rules) => {
+    if (onMonitoringChange) onMonitoringChange(widgetId, rules)
+    setEditingWidgetId(null)
+  }
+
   return (
     <div className="customize-frame">
       <div className="customize-header">
         <div>
-          <h1 className="customize-heading">Customize your dashboard</h1>
+          <h1 className="customize-heading">Edit dashboard</h1>
           <p className="customize-subheading">
-            Drag widgets from the library onto the dashboard, or drag existing widgets to rearrange them.
+            Rearrange, add, and customize widgets. Changes are not saved until you click Save changes.
           </p>
         </div>
         <div className="customize-actions">
@@ -426,7 +258,11 @@ export default function Customize({ onClose, config, onScopeChange }) {
           <button type="button" className="customize-btn primary" onClick={onClose}>Save changes</button>
         </div>
       </div>
-      <CustomizeBoard />
+
+      <CustomizeBoard
+        onEditWidget={setEditingWidgetId}
+        monitoring={config?.monitoring}
+      />
 
       <EditScopeModal
         isOpen={isEditScopeOpen}
@@ -434,6 +270,19 @@ export default function Customize({ onClose, config, onScopeChange }) {
         mode={config?.mode}
         onApply={handleApplyScope}
         onCancel={() => setEditScopeOpen(false)}
+      />
+
+      <EditWidgetModal
+        widgetId={editingWidgetId}
+        currentRules={
+          editingWidgetId ? config?.monitoring?.[editingWidgetId] : undefined
+        }
+        onSave={(rules) => handleSaveMonitoring(editingWidgetId, rules)}
+        onClose={() => setEditingWidgetId(null)}
+        onRemove={() => {
+          /* Deferred — the prototype removes via the X on the card. */
+          setEditingWidgetId(null)
+        }}
       />
     </div>
   )

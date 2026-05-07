@@ -1,6 +1,15 @@
+import DashboardSwitcher from './DashboardSwitcher.jsx'
 import './TopBar.css'
 
-export default function TopBar({ view, onCustomize }) {
+export default function TopBar({
+  view,
+  onCustomize,
+  dashboards,
+  activeDashboardId,
+  onSwitchDashboard,
+  onCreateDashboard,
+  onManageDashboards,
+}) {
   /* Edit Dashboard belongs to the saved-dashboard experience. Hide it
      during onboarding so the only edit affordance shown there is the
      "Edit Dashboard" button on the review step. */
@@ -23,8 +32,21 @@ export default function TopBar({ view, onCustomize }) {
               </svg>
             </button>
           </div>
-          <h1 className="topbar-title">Insights Dashboard</h1>
+
+          {/* Dashboard switcher replaces the static h1 title */}
+          {view === 'onboarding' ? (
+            <h1 className="topbar-title">Insights Dashboard</h1>
+          ) : (
+            <DashboardSwitcher
+              dashboards={dashboards || DEFAULT_DASHBOARDS}
+              activeDashboardId={activeDashboardId}
+              onSwitch={onSwitchDashboard || (() => {})}
+              onCreate={onCreateDashboard || (() => {})}
+              onManage={onManageDashboards || (() => {})}
+            />
+          )}
         </div>
+
         <div className="topbar-right">
           <div className="icon-btn primary" aria-hidden="true">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -51,3 +73,8 @@ export default function TopBar({ view, onCustomize }) {
     </div>
   )
 }
+
+/* Fallback dashboard list — used when App hasn't seeded dashboards yet */
+const DEFAULT_DASHBOARDS = [
+  { id: 'insights', name: 'Insights Dashboard' },
+]
