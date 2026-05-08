@@ -10,12 +10,12 @@ const MYSELF = {
   access: 'Full access · All permissions',
   permissions: {
     subAccounts:   { count: 5,  total: 5,  label: '5 of 5' },
-    terms:         { count: 3,  total: 3,  label: '3 of 3' },
+    term:          { count: 3,  total: 3,  label: '3 of 3' },
     studentGroups: { count: 12, total: 12, label: '12 of 12' },
     courses:       { count: null, label: 'All' },
     courseGroups:  { count: null, label: 'All' },
     instructors:   { count: null, label: 'All' },
-    modalities:    { count: null, label: 'All' },
+    modality:      { count: null, label: 'All' },
   },
 }
 
@@ -27,12 +27,12 @@ const OTHER_USERS = [
     access: 'Limited access',
     permissions: {
       subAccounts:   { count: 1, total: 5,  label: '1 of 5' },
-      terms:         { count: 1, total: 3,  label: '1 of 3' },
+      term:          { count: 1, total: 3,  label: '1 of 3' },
       studentGroups: { count: 3, total: 12, label: '3 of 12' },
       courses:       { count: null, label: 'Limited' },
       courseGroups:  { count: null, label: 'Limited' },
       instructors:   { count: null, label: 'None' },
-      modalities:    { count: null, label: 'All' },
+      modality:      { count: null, label: 'All' },
     },
   },
   {
@@ -42,12 +42,12 @@ const OTHER_USERS = [
     access: 'Partial access',
     permissions: {
       subAccounts:   { count: 2, total: 5,  label: '2 of 5' },
-      terms:         { count: 3, total: 3,  label: '3 of 3' },
+      term:          { count: 3, total: 3,  label: '3 of 3' },
       studentGroups: { count: 8, total: 12, label: '8 of 12' },
       courses:       { count: null, label: 'All' },
       courseGroups:  { count: null, label: 'Limited' },
       instructors:   { count: null, label: 'All' },
-      modalities:    { count: null, label: 'All' },
+      modality:      { count: null, label: 'All' },
     },
   },
   {
@@ -57,24 +57,27 @@ const OTHER_USERS = [
     access: 'Limited access',
     permissions: {
       subAccounts:   { count: 1, total: 5,  label: '1 of 5' },
-      terms:         { count: 2, total: 3,  label: '2 of 3' },
+      term:          { count: 2, total: 3,  label: '2 of 3' },
       studentGroups: { count: 2, total: 12, label: '2 of 12' },
       courses:       { count: null, label: 'Limited' },
       courseGroups:  { count: null, label: 'None' },
       instructors:   { count: null, label: 'None' },
-      modalities:    { count: null, label: 'Limited' },
+      modality:      { count: null, label: 'Limited' },
     },
   },
 ]
 
+/* The labels here drive the display in the Audience Preview panel —
+   "Terms" / "Modalities" plurals read fine for category headers. The
+   keys match the rest of the app (singular term / modality). */
 const PERMISSION_ROWS = [
   { key: 'subAccounts',   label: 'Sub accounts' },
-  { key: 'terms',         label: 'Terms' },
+  { key: 'term',          label: 'Terms' },
   { key: 'studentGroups', label: 'Student groups' },
   { key: 'courses',       label: 'Courses' },
   { key: 'courseGroups',  label: 'Course groups' },
   { key: 'instructors',   label: 'Instructors' },
-  { key: 'modalities',    label: 'Modalities' },
+  { key: 'modality',      label: 'Modalities' },
 ]
 
 const DEFAULT_WIDGETS = [
@@ -93,7 +96,7 @@ const ALL_OPTIONS = {
     { value: 'College of Education',  meta: '55 courses' },
     { value: 'School of Engineering', meta: '120 courses' },
   ],
-  terms:         [
+  term:          [
     { value: 'Spring 2025' },
     { value: 'Fall 2024' },
     { value: 'Winter 2025' },
@@ -126,7 +129,7 @@ const ALL_OPTIONS = {
     { value: 'Dr. Maria Santos' },
     { value: 'Dr. Kevin Osei' },
   ],
-  modalities:    [
+  modality:      [
     { value: 'In-Person' },
     { value: 'Online' },
     { value: 'Hybrid' },
@@ -352,13 +355,13 @@ function StepDetails({ form, onChange, audience, onAudienceChange }) {
 /* ── Step 2: Define scope ──────────────────────────────────── */
 
 const SCOPE_FIELDS = [
-  { key: 'subAccounts',   label: 'Sub Accounts',  description: 'Divisions or colleges within your institution. Select one or more to limit your dashboard to those areas.' },
-  { key: 'terms',         label: 'Term',           description: "The academic term or semester you want to focus on. Select one or more to filter your dashboard's data." },
+  { key: 'subAccounts',   label: 'Sub Accounts',   description: 'Divisions or colleges within your institution. Select one or more to limit your dashboard to those areas.' },
+  { key: 'term',          label: 'Term',           description: "The academic term or semester you want to focus on. Select one or more to filter your dashboard's data." },
   { key: 'studentGroups', label: 'Student Groups', description: 'Groups of students your institution has defined. Select one or more to focus your dashboard on those students.' },
   { key: 'courses',       label: 'Courses',        description: 'Individual courses offered at your institution. Select one or more to narrow your dashboard.' },
   { key: 'courseGroups',  label: 'Course Groups',  description: 'Groups of courses your institution has defined. Select one or more to focus your dashboard on those courses.' },
   { key: 'instructors',   label: 'Instructors',    description: 'The instructors teaching at your institution. Select one or more to focus on their courses.' },
-  { key: 'modalities',    label: 'Modalities',     description: 'The delivery format of courses. Select one or more to filter by how courses are taught.' },
+  { key: 'modality',      label: 'Modality',       description: 'The delivery format of courses. Select one or more to filter by how courses are taught.' },
 ]
 
 function ScopeField({ fieldDef, selected, onAdd, onRemove, audiencePerms }) {
