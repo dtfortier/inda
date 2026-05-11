@@ -10,10 +10,12 @@ export default function TopBar({
   onCreateDashboard,
   onManageDashboards,
 }) {
-  /* Edit Dashboard belongs to the saved-dashboard experience. Hide it
-     during onboarding so the only edit affordance shown there is the
-     "Edit Dashboard" button on the review step. */
   const showEditDashboard = view !== 'onboarding'
+  const isEditing = view === 'customize'
+
+  // Active dashboard name for the static title shown during edit mode
+  const activeName = dashboards?.find(d => d.id === activeDashboardId)?.name
+    || DEFAULT_DASHBOARDS[0].name
 
   return (
     <div className="topbar-frame">
@@ -33,9 +35,11 @@ export default function TopBar({
             </button>
           </div>
 
-          {/* Dashboard switcher replaces the static h1 title */}
-          {view === 'onboarding' ? (
-            <h1 className="topbar-title">Insights Dashboard</h1>
+          {/* Onboarding: static title
+              Edit mode: static title only (no switcher, no create button)
+              Dashboard: full switcher with create + manage */}
+          {view === 'onboarding' || isEditing ? (
+            <h1 className="topbar-title">{activeName}</h1>
           ) : (
             <DashboardSwitcher
               dashboards={dashboards || DEFAULT_DASHBOARDS}
@@ -74,7 +78,6 @@ export default function TopBar({
   )
 }
 
-/* Fallback dashboard list — used when App hasn't seeded dashboards yet */
 const DEFAULT_DASHBOARDS = [
   { id: 'insights', name: 'Insights Dashboard' },
 ]
