@@ -221,6 +221,10 @@ export default function App() {
     })
 
 
+  const handleLayoutChange = (newLayout) => {
+    updateActiveConfig(prev => ({ ...prev, layout: newLayout }))
+  }
+
   const handleAudienceChange = (newAudience) => {
     const id = activeDashboardId
     setDashboards(prev => {
@@ -330,6 +334,7 @@ export default function App() {
             audience={dashboards.find(d => d.id === activeDashboardId)?.audience}
             onScopeChange={handleScopeChange}
             onMonitoringChange={handleMonitoringChange}
+            onLayoutChange={handleLayoutChange}
             onDisplayChange={handleDisplayChange}
             onAudienceChange={handleAudienceChange}
           />
