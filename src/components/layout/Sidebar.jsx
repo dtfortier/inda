@@ -1,6 +1,5 @@
 import './Sidebar.css'
 
-/* SVG icon paths extracted from Figma design */
 const icons = {
   shieldUser: (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -14,14 +13,10 @@ const icons = {
       <path d="M2 21a8 8 0 0 1 10.434-7.62" />
       <circle cx="10" cy="8" r="5" />
       <circle cx="18" cy="18" r="3" />
-      <path d="m19.5 14.3-.4.9" />
-      <path d="m16.9 20.8-.4.9" />
-      <path d="m21.7 19.5-.9-.4" />
-      <path d="m15.2 16.9-.9-.4" />
-      <path d="m21.7 16.5-.9.4" />
-      <path d="m15.2 19.1-.9.4" />
-      <path d="m19.5 21.7-.4-.9" />
-      <path d="m16.9 15.2-.4-.9" />
+      <path d="m19.5 14.3-.4.9" /><path d="m16.9 20.8-.4.9" />
+      <path d="m21.7 19.5-.9-.4" /><path d="m15.2 16.9-.9-.4" />
+      <path d="m21.7 16.5-.9.4" /><path d="m15.2 19.1-.9.4" />
+      <path d="m19.5 21.7-.4-.9" /><path d="m16.9 15.2-.4-.9" />
     </svg>
   ),
   book: (
@@ -31,28 +26,19 @@ const icons = {
   ),
   hub: (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="2" />
-      <circle cx="12" cy="4" r="1" />
-      <circle cx="18.5" cy="8" r="1" />
-      <circle cx="18.5" cy="16" r="1" />
-      <circle cx="12" cy="20" r="1" />
-      <circle cx="5.5" cy="16" r="1" />
+      <circle cx="12" cy="12" r="2" /><circle cx="12" cy="4" r="1" />
+      <circle cx="18.5" cy="8" r="1" /><circle cx="18.5" cy="16" r="1" />
+      <circle cx="12" cy="20" r="1" /><circle cx="5.5" cy="16" r="1" />
       <circle cx="5.5" cy="8" r="1" />
-      <path d="M12 6v4" />
-      <path d="m16.5 9-3 1.7" />
-      <path d="m16.5 15-3-1.7" />
-      <path d="M12 18v-4" />
-      <path d="m7.5 15 3-1.7" />
-      <path d="m7.5 9 3 1.7" />
+      <path d="M12 6v4" /><path d="m16.5 9-3 1.7" /><path d="m16.5 15-3-1.7" />
+      <path d="M12 18v-4" /><path d="m7.5 15 3-1.7" /><path d="m7.5 9 3 1.7" />
     </svg>
   ),
   barChart: (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M3 3v16a2 2 0 0 0 2 2h16" />
-      <path d="M7 16h.01" />
-      <path d="M11 12h.01" />
-      <path d="M15 8h.01" />
-      <path d="M19 4h.01" />
+      <path d="M7 16h.01" /><path d="M11 12h.01" />
+      <path d="M15 8h.01" /><path d="M19 4h.01" />
     </svg>
   ),
   help: (
@@ -65,19 +51,41 @@ const icons = {
   panelLeftClose: (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <rect width="18" height="18" x="3" y="3" rx="2" />
-      <path d="M9 3v18" />
-      <path d="m16 15-3-3 3-3" />
+      <path d="M9 3v18" /><path d="m16 15-3-3 3-3" />
+    </svg>
+  ),
+  /* Reset / demo refresh icon */
+  reset: (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+      <path d="M3 3v5h5" />
     </svg>
   ),
 }
 
 const navItems = [
-  { id: 'admin', icon: icons.shieldUser },
-  { id: 'people', icon: icons.userRoundCog },
-  { id: 'courses', icon: icons.book },
-  { id: 'hub', icon: icons.hub },
+  { id: 'admin',    icon: icons.shieldUser },
+  { id: 'people',   icon: icons.userRoundCog },
+  { id: 'courses',  icon: icons.book },
+  { id: 'hub',      icon: icons.hub },
   { id: 'insights', icon: icons.barChart },
 ]
+
+const RESET_KEYS = [
+  'insights_dashboards_v2',
+  'insights_dashboards',
+  'insights_onboarding_config',
+]
+
+function handleReset() {
+  const confirmed = window.confirm(
+    'Reset demo?\n\nThis will erase all dashboards and return to the onboarding flow. This cannot be undone.'
+  )
+  if (!confirmed) return
+  RESET_KEYS.forEach(k => localStorage.removeItem(k))
+  sessionStorage.clear()
+  window.location.reload()
+}
 
 export default function Sidebar({ onHelp }) {
   return (
@@ -87,11 +95,9 @@ export default function Sidebar({ onHelp }) {
           {navItems.map((item) => (
             <button
               key={item.id}
-              className={`sidebar-nav-item ${item.id === 'insights' ? 'active' : ''}`}
+              className={`sidebar-nav-item${item.id === 'insights' ? ' active' : ''}`}
             >
-              <div className="sidebar-nav-icon">
-                {item.icon}
-              </div>
+              <div className="sidebar-nav-icon">{item.icon}</div>
             </button>
           ))}
         </nav>
@@ -105,6 +111,17 @@ export default function Sidebar({ onHelp }) {
           >
             <div className="sidebar-nav-icon">{icons.help}</div>
           </button>
+
+          {/* Demo reset — clears all dashboard data and reloads */}
+          <button
+            className="sidebar-nav-item sidebar-reset-btn"
+            onClick={handleReset}
+            aria-label="Reset demo"
+            title="Reset demo — erase all dashboards and start over"
+          >
+            <div className="sidebar-nav-icon">{icons.reset}</div>
+          </button>
+
           <button className="sidebar-nav-item">
             <div className="sidebar-nav-icon">{icons.panelLeftClose}</div>
           </button>
