@@ -321,7 +321,7 @@ export default function App() {
             onDisplayChange={handleDisplayChange}
           />
         )}
-        {view === 'dashboard' && <Dashboard config={config} />}
+        {view === 'dashboard' && <Dashboard config={config} audience={dashboards.find(d => d.id === activeDashboardId)?.audience} />}
         {view === 'manage' && (
           <ManageDashboardsPage
             dashboards={dashboards}
