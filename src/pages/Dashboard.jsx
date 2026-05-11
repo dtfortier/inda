@@ -70,6 +70,12 @@ function renderLargeColumn(layout, monitoring) {
 
 export default function Dashboard({ config }) {
   const monitoring = config?.monitoring || {}
+  /* Each dashboard can carry its own layout. New dashboards (or those
+     never customized) fall back to the registry default. Per-column
+     fallbacks make a partially-saved layout safe too. */
+  const largeLayout = config?.layout?.large || DEFAULT_LAYOUT.large
+  const mediumLayout = config?.layout?.medium || DEFAULT_LAYOUT.medium
+
   return (
     <div className="dashboard-scroll">
       <div className="dashboard-body">
@@ -80,10 +86,10 @@ export default function Dashboard({ config }) {
         )}
         <div className="dashboard-content">
           <div className="dashboard-col-large">
-            {renderLargeColumn(DEFAULT_LAYOUT.large, monitoring)}
+            {renderLargeColumn(largeLayout, monitoring)}
           </div>
           <div className="dashboard-col-medium">
-            {DEFAULT_LAYOUT.medium.map((w) => (
+            {mediumLayout.map((w) => (
               <div key={w.id}>{renderRegistryWidget(w.id, { monitoring })}</div>
             ))}
           </div>

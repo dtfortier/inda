@@ -67,9 +67,6 @@ const OTHER_USERS = [
   },
 ]
 
-/* The labels here drive the display in the Audience Preview panel —
-   "Terms" / "Modalities" plurals read fine for category headers. The
-   keys match the rest of the app (singular term / modality). */
 const PERMISSION_ROWS = [
   { key: 'subAccounts',   label: 'Sub accounts' },
   { key: 'term',          label: 'Terms' },
@@ -355,13 +352,13 @@ function StepDetails({ form, onChange, audience, onAudienceChange }) {
 /* ── Step 2: Define scope ──────────────────────────────────── */
 
 const SCOPE_FIELDS = [
-  { key: 'subAccounts',   label: 'Sub Accounts',   description: 'Divisions or colleges within your institution. Select one or more to limit your dashboard to those areas.' },
+  { key: 'subAccounts',   label: 'Sub Accounts',  description: 'Divisions or colleges within your institution. Select one or more to limit your dashboard to those areas.' },
   { key: 'term',          label: 'Term',           description: "The academic term or semester you want to focus on. Select one or more to filter your dashboard's data." },
   { key: 'studentGroups', label: 'Student Groups', description: 'Groups of students your institution has defined. Select one or more to focus your dashboard on those students.' },
   { key: 'courses',       label: 'Courses',        description: 'Individual courses offered at your institution. Select one or more to narrow your dashboard.' },
   { key: 'courseGroups',  label: 'Course Groups',  description: 'Groups of courses your institution has defined. Select one or more to focus your dashboard on those courses.' },
   { key: 'instructors',   label: 'Instructors',    description: 'The instructors teaching at your institution. Select one or more to focus on their courses.' },
-  { key: 'modality',      label: 'Modality',       description: 'The delivery format of courses. Select one or more to filter by how courses are taught.' },
+  { key: 'modality',      label: 'Modalities',     description: 'The delivery format of courses. Select one or more to filter by how courses are taught.' },
 ]
 
 function ScopeField({ fieldDef, selected, onAdd, onRemove, audiencePerms }) {
@@ -582,11 +579,8 @@ export default function CreateDashboardModal({ isOpen, onClose, onCreate }) {
 
   useEffect(() => {
     if (isOpen) {
-      setStep(1)
-      setForm({ name: '', description: '' })
-      setAudience(MYSELF)
-      setScope({})
-      setCreating(false)
+      setStep(1); setForm({ name: '', description: '' })
+      setAudience(MYSELF); setScope({}); setCreating(false)
     }
   }, [isOpen])
 
@@ -611,12 +605,12 @@ export default function CreateDashboardModal({ isOpen, onClose, onCreate }) {
     setCreating(true)
     setTimeout(() => {
       setCreating(false)
-      onCreate({ name: form.name || 'New Dashboard', audience, scope })
+      onCreate({ name: form.name || 'New Dashboard', scope })
       onClose()
     }, 800)
   }
   const handleSaveExit = () => {
-    onCreate({ name: form.name || 'New Dashboard', audience, scope })
+    onCreate({ name: form.name || 'New Dashboard', scope })
     onClose()
   }
 
@@ -650,14 +644,9 @@ export default function CreateDashboardModal({ isOpen, onClose, onCreate }) {
         </div>
 
         <FooterBar
-          step={step}
-          onBack={handleBack}
-          onCancel={onClose}
-          onSaveExit={handleSaveExit}
-          onNext={handleNext}
-          onCreate={handleCreate}
-          canProceed={canProceed}
-          creating={creating}
+          step={step} onBack={handleBack} onCancel={onClose}
+          onSaveExit={handleSaveExit} onNext={handleNext}
+          onCreate={handleCreate} canProceed={canProceed} creating={creating}
         />
       </div>
     </div>

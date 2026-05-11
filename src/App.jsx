@@ -149,6 +149,14 @@ function App() {
     })
   }
 
+  /* Called from Customize when the user clicks Save changes. The
+     incoming `layout` is the in-progress layout the user has been
+     editing locally; we merge it into the active dashboard's config so
+     it survives reload and dashboard switches. */
+  const handleLayoutChange = (newLayout) => {
+    updateActiveConfig((prev) => ({ ...(prev || {}), layout: newLayout }))
+  }
+
   /* ── Dashboard navigation ── */
   const handleSwitchDashboard = (id) => {
     setActiveDashboardId(id)
@@ -262,6 +270,7 @@ function App() {
             config={activeConfig}
             onScopeChange={handleScopeChange}
             onMonitoringChange={handleMonitoringChange}
+            onLayoutChange={handleLayoutChange}
           />
         )}
         {view === 'dashboard' && <Dashboard config={activeConfig} />}

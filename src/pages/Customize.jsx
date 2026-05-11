@@ -18,12 +18,12 @@ function GripIcon() {
   )
 }
 
-/* CustomizeBoard now renders real WidgetCard instances using the
-   shared registry, in edit mode. The drag-and-drop logic stays the
-   same; we just pass the drag handlers to WidgetCard instead of the
-   old WidgetSkeleton. */
-export function CustomizeBoard({ initialLayout, onEditWidget, monitoring }) {
-  const [layout, setLayout] = useState(initialLayout || DEFAULT_LAYOUT)
+/* CustomizeBoard renders real WidgetCard instances using the shared
+   registry, in edit mode. Drag-and-drop logic stays the same.
+
+   Now controlled: the parent passes `layout` and `onLayoutChange` so
+   the layout can be persisted on Save and discarded on Cancel. */
+export function CustomizeBoard({ layout, onLayoutChange, onEditWidget, monitoring }) {
   const [drag, setDrag] = useState(null)
   const [over, setOver] = useState(null)
 
@@ -100,14 +100,14 @@ export function CustomizeBoard({ initialLayout, onEditWidget, monitoring }) {
     }
     next.large = healed
 
-    setLayout(next)
+    onLayoutChange(next)
     endDrag()
   }
 
   const removeFromColumn = (column, index) => () => {
     const next = { large: [...layout.large], medium: [...layout.medium] }
     next[column].splice(index, 1)
-    setLayout(next)
+    onLayoutChange(next)
   }
 
   const renderEditableWidget = (column, item, index, sizeClass) => {
@@ -223,9 +223,16 @@ export function CustomizeBoard({ initialLayout, onEditWidget, monitoring }) {
   )
 }
 
-export default function Customize({ onClose, config, onScopeChange, onMonitoringChange }) {
+export default function Customize({ onClose, config, onScopeChange, onMonitoringChange, onLayoutChange }) {
   const [isEditScopeOpen, setEditScopeOpen] = useState(false)
   const [editingWidgetId, setEditingWidgetId] = useState(null)
+
+  /* Local layout state — drag/remove changes update this, but they
+     don't reach the saved config until the user clicks Save changes.
+     Cancel walks away with the current saved layout intact. The lazy
+     initializer reads the active dashboard's layout if it has one,
+     otherwise the registry default. */
+  const [layout, setLayout] = useState(() => config?.layout || DEFAULT_LAYOUT)
 
   const handleApplyScope = (newScope) => {
     if (onScopeChange) onScopeChange(newScope)
@@ -235,6 +242,14 @@ export default function Customize({ onClose, config, onScopeChange, onMonitoring
   const handleSaveMonitoring = (widgetId, rules) => {
     if (onMonitoringChange) onMonitoringChange(widgetId, rules)
     setEditingWidgetId(null)
+  }
+
+  /* Commit pending layout changes (if any) and exit. Scope and
+     monitoring already persist immediately when their modals close,
+     so this only needs to flush layout. */
+  const handleSaveChanges = () => {
+    if (onLayoutChange) onLayoutChange(layout)
+    onClose()
   }
 
   return (
@@ -255,11 +270,13 @@ export default function Customize({ onClose, config, onScopeChange, onMonitoring
           >
             Edit Scope
           </button>
-          <button type="button" className="customize-btn primary" onClick={onClose}>Save changes</button>
+          <button type="button" className="customize-btn primary" onClick={handleSaveChanges}>Save changes</button>
         </div>
       </div>
 
       <CustomizeBoard
+        layout={layout}
+        onLayoutChange={setLayout}
         onEditWidget={setEditingWidgetId}
         monitoring={config?.monitoring}
       />
