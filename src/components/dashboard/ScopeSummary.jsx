@@ -28,63 +28,36 @@ function buildSummaryParts(scope) {
   return parts
 }
 
-const AssignedUserIcon = () => (
-  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-    <circle cx="9" cy="7" r="4"/>
-    <line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/>
-  </svg>
-)
-
-export default function ScopeSummary({ scope, audience }) {
+export default function ScopeSummary({ scope }) {
   const [expanded, setExpanded] = useState(false)
   const parts = buildSummaryParts(scope)
 
-  const isAssigned = audience && audience.id !== 'myself'
-
-  if (parts.length === 0 && !isAssigned) return null
+  if (parts.length === 0) return null
 
   const fieldsWithItems = SCOPE_FIELDS.filter((f) => (scope?.[f.key] || []).length > 0)
 
   return (
     <section className="scope-summary" aria-label="Dashboard scope">
-
-      {/* Audience line — only for assigned dashboards, sits above scope */}
-      {isAssigned && (
-        <div className="scope-summary-audience">
-          <span className="scope-summary-audience-icon"><AssignedUserIcon /></span>
-          <span className="scope-summary-audience-text">
-            Assigned to <strong>{audience.label}</strong>
-            {audience.role && (
-              <span className="scope-summary-audience-role"> · {audience.role}</span>
-            )}
-          </span>
+      <div className="scope-summary-header">
+        <span className="scope-summary-pill">Scope</span>
+        <span className="scope-summary-divider" aria-hidden="true" />
+        <div className="scope-summary-line">
+          {parts.map((part, i) => (
+            <span key={i} className="scope-summary-part">
+              {part}
+              {i < parts.length - 1 && <span className="scope-summary-sep"> · </span>}
+            </span>
+          ))}
         </div>
-      )}
-
-      {/* Scope line — only render when there are scope selections */}
-      {parts.length > 0 && (
-        <div className={`scope-summary-header${isAssigned ? ' scope-summary-header--with-audience' : ''}`}>
-          <span className="scope-summary-pill">Scope</span>
-          <span className="scope-summary-divider" aria-hidden="true" />
-          <div className="scope-summary-line">
-            {parts.map((part, i) => (
-              <span key={i} className="scope-summary-part">
-                {part}
-                {i < parts.length - 1 && <span className="scope-summary-sep"> · </span>}
-              </span>
-            ))}
-          </div>
-          <button
-            type="button"
-            className="scope-summary-toggle"
-            onClick={() => setExpanded((v) => !v)}
-            aria-expanded={expanded}
-          >
-            {expanded ? 'Collapse' : 'View all'}
-          </button>
-        </div>
-      )}
+        <button
+          type="button"
+          className="scope-summary-toggle"
+          onClick={() => setExpanded((v) => !v)}
+          aria-expanded={expanded}
+        >
+          {expanded ? 'Collapse' : 'View all'}
+        </button>
+      </div>
 
       {expanded && (
         <>

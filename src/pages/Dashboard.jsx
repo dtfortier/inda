@@ -65,23 +65,46 @@ function renderLargeColumn(layout, monitoring, display) {
   return out
 }
 
+const AssignedIcon = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+    <circle cx="9" cy="7" r="4"/>
+    <line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/>
+  </svg>
+)
+
 export default function Dashboard({ config, audience }) {
   const monitoring   = config?.monitoring || {}
   const display      = config?.display    || {}
   const largeLayout  = config?.layout?.large  || DEFAULT_LAYOUT.large
   const mediumLayout = config?.layout?.medium || DEFAULT_LAYOUT.medium
 
-  // Show scope card if there's scope data OR an assigned audience
-  const showScopeCard = config?.scope || (audience && audience.id !== 'myself')
+  const isAssigned = audience && audience.id !== 'myself'
 
   return (
     <div className="dashboard-scroll">
       <div className="dashboard-body">
-        {showScopeCard && (
-          <div className="dashboard-scope-bar">
-            <ScopeSummary scope={config?.scope} audience={audience} />
+
+        {/* Audience attribution — sits above the scope card in the page bg,
+            only visible for dashboards assigned to another user */}
+        {isAssigned && (
+          <div className="dashboard-assigned-row">
+            <span className="dashboard-assigned-icon"><AssignedIcon /></span>
+            <span className="dashboard-assigned-text">
+              Assigned to <strong>{audience.label}</strong>
+              {audience.role && (
+                <span className="dashboard-assigned-role"> · {audience.role}</span>
+              )}
+            </span>
           </div>
         )}
+
+        {config?.scope && (
+          <div className="dashboard-scope-bar">
+            <ScopeSummary scope={config.scope} />
+          </div>
+        )}
+
         <div className="dashboard-content">
           <div className="dashboard-col-large">
             {renderLargeColumn(largeLayout, monitoring, display)}
