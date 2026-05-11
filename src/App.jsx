@@ -220,6 +220,17 @@ export default function App() {
       return { ...prev, display }
     })
 
+
+  const handleAudienceChange = (newAudience) => {
+    const id = activeDashboardId
+    setDashboards(prev => {
+      const next = prev.map(d =>
+        d.id === id ? { ...d, audience: newAudience, updatedAt: Date.now() } : d
+      )
+      saveDashboards(next)
+      return next
+    })
+  }
   /* ── Dashboard switcher ─────────────────────────────────── */
 
   const handleSwitchDashboard = (id) => {
@@ -316,9 +327,11 @@ export default function App() {
           <Customize
             onClose={handleCloseCustomize}
             config={config}
+            audience={dashboards.find(d => d.id === activeDashboardId)?.audience}
             onScopeChange={handleScopeChange}
             onMonitoringChange={handleMonitoringChange}
             onDisplayChange={handleDisplayChange}
+            onAudienceChange={handleAudienceChange}
           />
         )}
         {view === 'dashboard' && <Dashboard config={config} audience={dashboards.find(d => d.id === activeDashboardId)?.audience} />}
