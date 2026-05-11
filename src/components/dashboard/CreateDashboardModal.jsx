@@ -605,12 +605,12 @@ export default function CreateDashboardModal({ isOpen, onClose, onCreate }) {
     setCreating(true)
     setTimeout(() => {
       setCreating(false)
-      onCreate({ name: form.name || 'New Dashboard', scope })
+      onCreate({ name: form.name || 'New Dashboard', scope, audience })
       onClose()
     }, 800)
   }
   const handleSaveExit = () => {
-    onCreate({ name: form.name || 'New Dashboard', scope })
+    onCreate({ name: form.name || 'New Dashboard', scope, audience })
     onClose()
   }
 
