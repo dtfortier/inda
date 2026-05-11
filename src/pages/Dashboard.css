@@ -5,10 +5,6 @@
   scrollbar-width: none;
 }
 
-/* ── Page load animation ── */
-/* `to` uses `transform: none` (not `translateY(0)`) so the element doesn't
-   retain a containing block — otherwise fixed-position modal overlays
-   inside `.widget-pair` render relative to the pair instead of the viewport. */
 @keyframes dashboard-fade-in {
   from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: none; }
@@ -67,13 +63,45 @@
   padding: 0 32px;
 }
 
-/* Wrapper around the ScopeSummary card so it aligns with .dashboard-content's
-   max-width and horizontal padding. The card itself has its own border and
-   padding; this wrapper just handles centering and breathing room. */
+/* Audience attribution row — matches scope bar alignment exactly */
+.dashboard-assigned-row {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 24px 32px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--color-text-muted, #6b7280);
+  line-height: 1.4;
+}
+
+.dashboard-assigned-icon {
+  display: flex;
+  align-items: center;
+  color: var(--color-btn-primary-bg, #0e1f5b);
+  opacity: 0.65;
+  flex-shrink: 0;
+}
+
+.dashboard-assigned-text strong {
+  color: var(--color-text-primary, #1a1f36);
+  font-weight: 600;
+}
+
+.dashboard-assigned-role {
+  color: var(--color-text-muted, #6b7280);
+}
+
+/* Scope bar — same max-width/margin as above, tighter top when audience shown */
 .dashboard-scope-bar {
   max-width: 1300px;
   margin: 0 auto;
   padding: 32px 32px 0;
+}
+
+.dashboard-assigned-row + .dashboard-scope-bar {
+  padding-top: 10px;
 }
 
 .dashboard-scope-bar + .dashboard-content {
@@ -99,7 +127,6 @@
   gap: 24px;
 }
 
-/* Side-by-side pair inside large column */
 .widget-pair {
   display: flex;
   gap: 24px;
@@ -110,12 +137,12 @@
   min-width: 0;
 }
 
-/* ── Responsive (INST UI breakpoints) ── */
+/* ── Responsive ── */
 
-/* large: 1024–1199 — two columns, proportional */
 @media (max-width: 1199px) {
   .dashboard-content { padding: 0 24px; gap: 24px; }
   .dashboard-scope-bar { padding: 24px 24px 0; }
+  .dashboard-assigned-row { padding: 24px 24px 0; }
   .dashboard-col-large {
     width: auto;
     max-width: none;
@@ -126,14 +153,10 @@
   .dashboard-col-medium { width: 320px; }
 }
 
-/* medium: 768–1023 — single column stack */
 @media (max-width: 1023px) {
-  .dashboard-content {
-    flex-direction: column;
-    gap: 24px;
-    padding: 0 24px;
-  }
+  .dashboard-content { flex-direction: column; gap: 24px; padding: 0 24px; }
   .dashboard-scope-bar { padding: 24px 24px 0; }
+  .dashboard-assigned-row { padding: 24px 24px 0; }
   .dashboard-col-large,
   .dashboard-col-medium {
     width: 100%;
@@ -144,16 +167,15 @@
   .widget-pair { flex-direction: column; }
 }
 
-/* small: <768 — tighter padding */
 @media (max-width: 767px) {
   .dashboard-body { padding: 0 0 var(--spacing-md); }
   .dashboard-content { padding: 0 16px; gap: 20px; }
   .dashboard-scope-bar { padding: 16px 16px 0; }
+  .dashboard-assigned-row { padding: 16px 16px 0; }
   .dashboard-col-large,
   .dashboard-col-medium { gap: 20px; }
 }
 
-/* Disclaimer */
 .dashboard-disclaimer {
   text-align: center;
   font-size: 12px;
@@ -162,7 +184,6 @@
   margin: 0;
 }
 
-/* SINOA modal layout — stack chart + metrics, centered */
 .sinoa-modal-content {
   width: 100%;
   display: flex;
@@ -216,4 +237,3 @@
   .sinoa-stats { gap: 32px; }
   .sinoa-stat-value { font-size: 22px; }
 }
-
