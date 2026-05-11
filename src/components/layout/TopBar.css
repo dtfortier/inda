@@ -1,6 +1,7 @@
 .topbar-frame {
-  flex-shrink: 0;
-  padding: var(--spacing-lg) var(--spacing-lg) 0 0;
+  position: relative;  /* add this */
+  z-index: 50;         /* add this */
+  /* ...rest of existing styles stay the same */
 }
 
 .topbar-bar {

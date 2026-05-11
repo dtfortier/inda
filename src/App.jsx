@@ -5,293 +5,259 @@ import Dashboard from './pages/Dashboard.jsx'
 import Onboarding from './pages/Onboarding.jsx'
 import Customize from './pages/Customize.jsx'
 import CreateDashboardModal from './components/dashboard/CreateDashboardModal.jsx'
-import ManageDashboardsModal from './components/dashboard/ManageDashboardsModal.jsx'
+import ManageDashboardsPage from './components/dashboard/ManageDashboardsPage.jsx'
 import { Login } from './Login.jsx'
 import './App.css'
 
-/* ── Storage keys ──────────────────────────────────────────────
-   v2 stores the new shape: an array of dashboards, each owning its
-   own config (scope, monitoring, audience, etc.). Old keys are kept
-   only so we can migrate v1 data on first load. */
-const DASHBOARDS_V2_KEY = 'insights_dashboards_v2'
-const LEGACY_CONFIG_KEY = 'insights_onboarding_config'
-const LEGACY_DASHBOARDS_KEY = 'insights_dashboards'
+const DASHBOARDS_KEY = 'insights_dashboards_v2'
+const STORAGE_KEY    = 'insights_onboarding_config'
 
-function safeParse(raw) {
-  try { return raw ? JSON.parse(raw) : null } catch { return null }
+function loadLegacyConfig() {
+  try { const r = localStorage.getItem(STORAGE_KEY); return r ? JSON.parse(r) : null } catch { return null }
 }
 
-/* Read v2 if present, otherwise migrate from v1 (legacy single
-   config + legacy dashboard list). The first dashboard in the
-   migrated list inherits the legacy config so the user's existing
-   scope / monitoring carry over. */
-function loadDashboardList() {
-  const v2 = safeParse(localStorage.getItem(DASHBOARDS_V2_KEY))
-  if (Array.isArray(v2) && v2.length > 0) return v2
-
-  const legacyConfig = safeParse(localStorage.getItem(LEGACY_CONFIG_KEY))
-  const legacyDashboards = safeParse(localStorage.getItem(LEGACY_DASHBOARDS_KEY))
-
-  if (legacyConfig || legacyDashboards) {
-    const list = (Array.isArray(legacyDashboards) && legacyDashboards.length > 0)
-      ? legacyDashboards.map((d, i) => ({
-          id: d.id,
-          name: d.name,
-          config: i === 0 ? (legacyConfig || null) : null,
-        }))
-      : [{ id: 'insights', name: 'Insights Dashboard', config: legacyConfig || null }]
-    /* Persist the migrated list to v2 so subsequent loads skip
-       the migration path. */
-    try { localStorage.setItem(DASHBOARDS_V2_KEY, JSON.stringify(list)) } catch { /* ignore */ }
-    return list
-  }
-
-  /* Fresh install — return null so the caller can route to onboarding. */
-  return null
+function seedDashboards() {
+  const now = Date.now()
+  const legacy = loadLegacyConfig()
+  return [
+    {
+      id: 'insights', name: 'Insights Dashboard', pinned: true,
+      audience: { id: 'myself', label: 'Myself' },
+      config: legacy || {},
+      updatedAt: now - 1000 * 60 * 60 * 2,
+    },
+    {
+      id: 'exec-summary', name: 'Executive Summary', pinned: false,
+      audience: { id: 'myself', label: 'Myself' },
+      config: { scope: { term: ['Spring 2025'], subAccounts: ['College of Science'] } },
+      updatedAt: now - 1000 * 60 * 60 * 48,
+    },
+    {
+      id: 'enrollment-risk', name: 'Enrollment Risk Overview', pinned: false,
+      audience: { id: 'myself', label: 'Myself' },
+      config: { scope: { term: ['Fall 2024'], studentGroups: ['Students on Probation'], subAccounts: ['College of Arts'] } },
+      updatedAt: now - 1000 * 60 * 60 * 96,
+    },
+    {
+      id: 'advisor-db', name: 'Advisor Dashboard', pinned: false,
+      audience: { id: 'sarah', label: 'Sarah Johnson', role: 'Advisor · College of Science' },
+      config: {},
+      updatedAt: now - 1000 * 60 * 60 * 24,
+    },
+    {
+      id: 'athletics-db', name: 'Athletics Dashboard', pinned: false,
+      audience: { id: 'miller', label: 'Coach Miller', role: 'Athletics · Basketball Program' },
+      config: {},
+      updatedAt: now - 1000 * 60 * 60 * 72,
+    },
+    {
+      id: 'retention-db', name: 'Retention Dashboard', pinned: false,
+      audience: { id: 'wilson', label: 'Dean Wilson', role: 'Dean · College of Arts & Letters' },
+      config: {},
+      updatedAt: now - 1000 * 60 * 60 * 120,
+    },
+    {
+      id: 'student-success', name: 'Student Success Overview', pinned: false,
+      audience: { id: 'garcia', label: 'Maria Garcia', role: 'Success Coach · First-Year Program' },
+      config: {},
+      updatedAt: now - 1000 * 60 * 60 * 240,
+    },
+  ]
 }
 
-function saveDashboardList(list) {
-  try { localStorage.setItem(DASHBOARDS_V2_KEY, JSON.stringify(list)) } catch { /* ignore */ }
+function loadDashboards() {
+  try {
+    const raw = localStorage.getItem(DASHBOARDS_KEY)
+    if (raw) return JSON.parse(raw)
+  } catch { /* ignore */ }
+  return seedDashboards()
 }
 
-/* Build a config object from CreateDashboardModal's payload. */
-function buildConfigFromModal({ audience, scope }) {
-  return {
-    mode: 'manual',
-    focusAreas: [],
-    scope: scope || {},
-    monitoring: {},
-    audience: audience || null,
-  }
+function saveDashboards(list) {
+  try { localStorage.setItem(DASHBOARDS_KEY, JSON.stringify(list)) } catch { /* ignore */ }
 }
 
 const BYPASS_LOGIN = import.meta.env.VITE_BYPASS_LOGIN === '1'
 
-const DEFAULT_DASHBOARDS = [
-  { id: 'insights', name: 'Insights Dashboard', config: null },
-]
-
-function App() {
+export default function App() {
   const [authed, setAuthed] = useState(
     () => BYPASS_LOGIN || sessionStorage.getItem('inda_auth') === '1'
   )
-
-  /* Single source of truth for everything dashboard-related. Each entry
-     owns its own config; the active one drives Dashboard + Customize. */
-  const [dashboards, setDashboards] = useState(() => loadDashboardList() || DEFAULT_DASHBOARDS)
+  const [dashboards, setDashboards] = useState(() => loadDashboards())
   const [activeDashboardId, setActiveDashboardId] = useState(
-    () => (loadDashboardList() || DEFAULT_DASHBOARDS)[0]?.id || 'insights'
+    () => loadDashboards()[0]?.id || 'insights'
   )
-
-  /* Show onboarding only on a true first-run (no dashboards stored
-     and no scope yet on the first dashboard). After that, all new
-     dashboards come through CreateDashboardModal. */
   const [view, setView] = useState(() => {
-    const list = loadDashboardList()
-    return list?.[0]?.config ? 'dashboard' : 'onboarding'
+    const first = loadDashboards()[0]
+    return first?.config && Object.keys(first.config).length > 0 ? 'dashboard' : 'onboarding'
   })
-
   const [createModalOpen, setCreateModalOpen] = useState(false)
-  const [manageModalOpen, setManageModalOpen] = useState(false)
 
   if (!authed) return <Login onSuccess={() => setAuthed(true)} />
 
-  /* Derive the active dashboard's config every render. If the active
-     id ever points at a missing dashboard (e.g. after a delete), fall
-     back to the first one. */
-  const activeDashboard =
-    dashboards.find((d) => d.id === activeDashboardId) || dashboards[0]
-  const activeConfig = activeDashboard?.config || null
+  /* ── Helpers ────────────────────────────────────────────── */
 
-  /* Helper: replace the active dashboard's config and persist. The
-     `updater` may be a value or a function (prev) => next, mirroring
-     the React useState API for ergonomic in-place edits. */
-  const updateActiveConfig = (updater) => {
-    setDashboards((prev) => {
-      const next = prev.map((d) => {
-        if (d.id !== activeDashboardId) return d
-        const nextConfig =
-          typeof updater === 'function' ? updater(d.config || null) : updater
-        return { ...d, config: nextConfig }
-      })
-      saveDashboardList(next)
+  const getActiveConfig = () =>
+    dashboards.find(d => d.id === activeDashboardId)?.config || {}
+
+  const touchDashboard = (id, updater) => {
+    setDashboards(prev => {
+      const next = prev.map(d =>
+        d.id === id ? { ...updater(d), updatedAt: Date.now() } : d
+      )
+      saveDashboards(next)
       return next
     })
   }
 
-  /* ── Onboarding (first-run only) ── */
+  const updateActiveConfig = (updater) =>
+    touchDashboard(activeDashboardId, d => ({ ...d, config: updater(d.config || {}) }))
+
+  /* ── Onboarding / view ──────────────────────────────────── */
+
   const handleComplete = (nextConfig) => {
-    updateActiveConfig(nextConfig)
+    updateActiveConfig(() => nextConfig)
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(nextConfig))
     setView('dashboard')
   }
 
   const handleEditFromOnboarding = (nextConfig) => {
-    updateActiveConfig(nextConfig)
+    updateActiveConfig(() => nextConfig)
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(nextConfig))
     setView('customize')
   }
 
-  const handleOnboarding = () => setView('onboarding')
-  const handleCustomize = () => setView('customize')
+  const handleOnboarding     = () => setView('onboarding')
+  const handleCustomize      = () => setView('customize')
   const handleCloseCustomize = () => setView('dashboard')
 
-  /* ── Active-dashboard config edits (Edit Scope, Edit Widget) ── */
-  const handleScopeChange = (newScope) => {
-    updateActiveConfig((prev) => ({ ...(prev || {}), scope: newScope }))
-  }
+  /* ── Scope + monitoring ─────────────────────────────────── */
 
-  const handleMonitoringChange = (widgetId, rules) => {
-    updateActiveConfig((prev) => {
-      const prevMonitoring = (prev && prev.monitoring) || {}
-      return {
-        ...(prev || {}),
-        monitoring: { ...prevMonitoring, [widgetId]: rules },
-      }
+  const handleScopeChange = (newScope) =>
+    updateActiveConfig(prev => ({ ...prev, scope: newScope }))
+
+  const handleMonitoringChange = (widgetId, rules) =>
+    updateActiveConfig(prev => ({
+      ...prev,
+      monitoring: { ...(prev.monitoring || {}), [widgetId]: rules },
+    }))
+
+  const handleDisplayChange = (widgetId, mode) =>
+    updateActiveConfig(prev => {
+      const display = { ...(prev.display || {}) }
+      if (mode === 'table') display[widgetId] = 'table'
+      else delete display[widgetId]
+      return { ...prev, display }
     })
-  }
 
-  /* Called from Customize when the user clicks Save changes. The
-     incoming `layout` is the in-progress layout the user has been
-     editing locally; we merge it into the active dashboard's config so
-     it survives reload and dashboard switches. */
-  const handleLayoutChange = (newLayout) => {
-    updateActiveConfig((prev) => ({ ...(prev || {}), layout: newLayout }))
-  }
+  /* ── Dashboard switcher ─────────────────────────────────── */
 
-  /* Per-widget display preference: 'chart' (default) or 'table'.
-     Stored as { [widgetId]: 'chart'|'table' } on the active config.
-     'chart' values are stripped to keep storage small — absence means
-     chart, presence-of-'table' means table. */
-  const handleDisplayChange = (widgetId, mode) => {
-    updateActiveConfig((prev) => {
-      const prevDisplay = (prev && prev.display) || {}
-      const nextDisplay = { ...prevDisplay }
-      if (mode === 'table') {
-        nextDisplay[widgetId] = 'table'
-      } else {
-        delete nextDisplay[widgetId]
-      }
-      return { ...(prev || {}), display: nextDisplay }
-    })
-  }
-
-  /* ── Dashboard navigation ── */
   const handleSwitchDashboard = (id) => {
     setActiveDashboardId(id)
-    /* Always land on the dashboard view when switching. If the user
-       was mid-customize, switching cancels that. */
-    setView('dashboard')
+    const target = dashboards.find(d => d.id === id)
+    const hasConfig = target?.config && Object.keys(target.config).length > 0
+    setView(hasConfig ? 'dashboard' : 'onboarding')
   }
 
-  const handleCreateDashboard = () => setCreateModalOpen(true)
+  const handleCreateDashboard  = () => setCreateModalOpen(true)
+  const handleManageDashboards = () => setView('manage')
 
-  /* Receives { name, audience, scope } from CreateDashboardModal. The
-     audience + scope produced by the modal are baked into the new
-     dashboard's config so it actually shows different data. */
-  const handleDashboardCreated = (payload) => {
+  const handleDashboardCreated = ({ name, scope, audience }) => {
     const newId = `dashboard-${Date.now()}`
-    const newDashboard = {
-      id: newId,
-      name: payload?.name || 'New Dashboard',
-      config: buildConfigFromModal(payload || {}),
-    }
-    const updated = [...dashboards, newDashboard]
+    const updated = [
+      ...dashboards,
+      { id: newId, name: name || 'New Dashboard', pinned: false,
+        audience: audience || { id: 'myself', label: 'Myself' },
+        config: { scope }, updatedAt: Date.now() },
+    ]
     setDashboards(updated)
-    saveDashboardList(updated)
+    saveDashboards(updated)
     setActiveDashboardId(newId)
     setView('dashboard')
   }
 
-  /* ── Manage Dashboards ── */
-  const handleManageDashboards = () => setManageModalOpen(true)
+  /* ── Manage dashboards actions ──────────────────────────── */
 
-  const handleRenameDashboard = (id, newName) => {
-    const trimmed = (newName || '').trim()
-    if (!trimmed) return
-    setDashboards((prev) => {
-      const next = prev.map((d) => (d.id === id ? { ...d, name: trimmed } : d))
-      saveDashboardList(next)
-      return next
-    })
-  }
+  const handleRenameDashboard = (id, newName) =>
+    touchDashboard(id, d => ({ ...d, name: newName }))
+
+  const handlePinDashboard = (id) =>
+    touchDashboard(id, d => ({ ...d, pinned: !d.pinned }))
 
   const handleDuplicateDashboard = (id) => {
-    setDashboards((prev) => {
-      const idx = prev.findIndex((d) => d.id === id)
-      if (idx === -1) return prev
-      const source = prev[idx]
-      const newId = `dashboard-${Date.now()}`
-      /* Deep-clone the config so future edits to the duplicate don't
-         leak back into the original. structuredClone is widely
-         supported now; falls back to JSON-clone if needed. */
-      let configCopy = null
-      if (source.config) {
-        try {
-          configCopy = typeof structuredClone === 'function'
-            ? structuredClone(source.config)
-            : JSON.parse(JSON.stringify(source.config))
-        } catch {
-          configCopy = JSON.parse(JSON.stringify(source.config))
-        }
-      }
-      const dupe = {
-        id: newId,
-        name: `${source.name} (Copy)`,
-        config: configCopy,
-      }
-      const next = [...prev.slice(0, idx + 1), dupe, ...prev.slice(idx + 1)]
-      saveDashboardList(next)
-      return next
-    })
+    const source = dashboards.find(d => d.id === id)
+    if (!source) return
+    const copy = {
+      ...source, id: `dashboard-${Date.now()}`,
+      name: `${source.name} (Copy)`, pinned: false,
+      config: JSON.parse(JSON.stringify(source.config || {})),
+      updatedAt: Date.now(),
+    }
+    const updated = [...dashboards, copy]
+    setDashboards(updated)
+    saveDashboards(updated)
   }
 
   const handleDeleteDashboard = (id) => {
-    setDashboards((prev) => {
-      /* Refuse to delete the last dashboard — the app needs at least
-         one to render anything. The Manage modal disables the delete
-         action in that case too, but this is the safety net. */
-      if (prev.length <= 1) return prev
-      const next = prev.filter((d) => d.id !== id)
-      saveDashboardList(next)
-      /* If we just deleted the active one, point at the first
-         remaining dashboard so the view doesn't break. */
-      if (id === activeDashboardId) {
-        setActiveDashboardId(next[0].id)
-      }
-      return next
-    })
+    if (dashboards.length <= 1) return
+    const updated = dashboards.filter(d => d.id !== id)
+    setDashboards(updated)
+    saveDashboards(updated)
+    if (activeDashboardId === id) {
+      setActiveDashboardId(updated[0].id)
+      const hasConfig = updated[0].config && Object.keys(updated[0].config).length > 0
+      setView(hasConfig ? 'dashboard' : 'onboarding')
+    }
   }
+
+  const config = getActiveConfig()
 
   return (
     <div className="app-shell">
       <Sidebar onHelp={handleOnboarding} />
       <div className="app-main">
-        <TopBar
-          view={view}
-          onCustomize={handleCustomize}
-          dashboards={dashboards}
-          activeDashboardId={activeDashboardId}
-          onSwitchDashboard={handleSwitchDashboard}
-          onCreateDashboard={handleCreateDashboard}
-          onManageDashboards={handleManageDashboards}
-        />
+        {view !== 'manage' && (
+          <TopBar
+            view={view}
+            onCustomize={handleCustomize}
+            dashboards={dashboards}
+            activeDashboardId={activeDashboardId}
+            onSwitchDashboard={handleSwitchDashboard}
+            onCreateDashboard={handleCreateDashboard}
+            onManageDashboards={handleManageDashboards}
+          />
+        )}
+
         {view === 'onboarding' && (
           <Onboarding
             onComplete={handleComplete}
             onEditDashboard={handleEditFromOnboarding}
-            initialConfig={activeConfig}
+            initialConfig={config}
           />
         )}
         {view === 'customize' && (
           <Customize
             onClose={handleCloseCustomize}
-            config={activeConfig}
+            config={config}
             onScopeChange={handleScopeChange}
             onMonitoringChange={handleMonitoringChange}
-            onLayoutChange={handleLayoutChange}
             onDisplayChange={handleDisplayChange}
           />
         )}
-        {view === 'dashboard' && <Dashboard config={activeConfig} />}
+        {view === 'dashboard' && <Dashboard config={config} />}
+        {view === 'manage' && (
+          <ManageDashboardsPage
+            dashboards={dashboards}
+            activeDashboardId={activeDashboardId}
+            onBack={() => setView('dashboard')}
+            onSwitch={handleSwitchDashboard}
+            onCreate={handleCreateDashboard}
+            onRename={handleRenameDashboard}
+            onPin={handlePinDashboard}
+            onDuplicate={handleDuplicateDashboard}
+            onDelete={handleDeleteDashboard}
+          />
+        )}
       </div>
 
       <CreateDashboardModal
@@ -299,18 +265,6 @@ function App() {
         onClose={() => setCreateModalOpen(false)}
         onCreate={handleDashboardCreated}
       />
-
-      <ManageDashboardsModal
-        isOpen={manageModalOpen}
-        onClose={() => setManageModalOpen(false)}
-        dashboards={dashboards}
-        activeDashboardId={activeDashboardId}
-        onRename={handleRenameDashboard}
-        onDuplicate={handleDuplicateDashboard}
-        onDelete={handleDeleteDashboard}
-      />
     </div>
   )
 }
-
-export default App

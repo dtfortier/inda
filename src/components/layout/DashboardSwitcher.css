@@ -1,233 +1,181 @@
-/* ── Dashboard Switcher — shared root ───────────────────────── */
-
-.ds-root {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  position: relative;
-}
+/* ── Root ──────────────────────────────────────────────────── */
+.ds-root { display: flex; align-items: center; gap: 8px; position: relative; }
 
 /* ── Single-dashboard state ─────────────────────────────────── */
-
-.ds-root--single {
-  animation: ds-fade-in 0.25s ease;
-}
+.ds-root--single { animation: ds-fade 0.22s ease both; }
 
 .ds-title-static {
-  font-size: 1.1rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: var(--color-topbar-text, #1a1f36);
-  white-space: nowrap;
+  font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em;
+  color: var(--color-topbar-text, #1a1f36); white-space: nowrap;
 }
 
-/* Tertiary text button: "+ Create new dashboard" */
 .ds-create-text-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
+  display: inline-flex; align-items: center; gap: 5px;
   padding: 4px 10px;
-  border: 1.5px solid rgba(14, 31, 91, 0.22);
-  border-radius: 6px;
-  background: transparent;
-  color: var(--color-topbar-text, #1a1f36);
-  font-family: inherit;
-  font-size: 0.8rem;
-  font-weight: 500;
-  opacity: 0.72;
-  cursor: pointer;
-  white-space: nowrap;
+  border: 1.5px solid rgba(14,31,91,0.22); border-radius: 6px;
+  background: transparent; font-family: inherit; font-size: 0.8rem;
+  font-weight: 500; color: var(--color-topbar-text, #1a1f36);
+  opacity: 0.72; cursor: pointer; white-space: nowrap;
   transition: opacity 0.15s, border-color 0.15s, background 0.15s;
 }
+.ds-create-text-btn:hover { opacity: 1; border-color: var(--color-btn-primary-bg,#0e1f5b); background: rgba(14,31,91,0.05); }
 
-.ds-create-text-btn:hover {
-  opacity: 1;
-  border-color: var(--color-btn-primary-bg, #0e1f5b);
-  background: rgba(14, 31, 91, 0.05);
-}
+/* ── Multi-dashboard trigger ────────────────────────────────── */
+.ds-root--multi { animation: ds-morph-in 0.28s ease both; }
 
-.ds-create-text-btn:focus-visible {
-  outline: 2px solid var(--color-btn-primary-bg, #0e1f5b);
-  outline-offset: 2px;
-}
-
-/* ── Multi-dashboard switcher state ─────────────────────────── */
-
-.ds-root--multi {
-  animation: ds-morph-in 0.3s ease;
-}
-
-/* Trigger button — looks like the page title, not a heavy CTA */
 .ds-trigger {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: none;
-  border: none;
-  padding: 4px 6px;
-  margin: -4px -6px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-family: inherit;
-  color: inherit;
+  display: flex; align-items: center; gap: 6px;
+  background: none; border: none; padding: 4px 6px; margin: -4px -6px;
+  border-radius: 6px; cursor: pointer; font-family: inherit;
   transition: background 0.15s;
 }
-
-.ds-trigger:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.ds-trigger:focus-visible {
-  outline: 2px solid var(--color-btn-primary-bg, #0e1f5b);
-  outline-offset: 2px;
-}
+.ds-trigger:hover { background: rgba(255,255,255,0.12); }
+.ds-trigger--open { background: rgba(255,255,255,0.12); }
 
 .ds-trigger-label {
-  font-size: 1.1rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: var(--color-topbar-text, #1a1f36);
-  white-space: nowrap;
+  font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em;
+  color: var(--color-topbar-text, #1a1f36); white-space: nowrap;
 }
+.ds-chevron { color: var(--color-topbar-text, #1a1f36); opacity: 0.6; display: flex; align-items: center; transition: transform 0.2s ease; }
+.ds-chevron.open { transform: rotate(180deg); }
 
-.ds-chevron {
-  color: var(--color-topbar-text, #1a1f36);
-  opacity: 0.6;
-  display: flex;
-  align-items: center;
-  transition: transform 0.2s ease;
-}
-
-.ds-chevron.open {
-  transform: rotate(180deg);
-}
-
-/* Dropdown panel */
+/* ── Dropdown panel ─────────────────────────────────────────── */
 .ds-dropdown {
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 10px);
   left: 0;
-  min-width: 240px;
+  width: 420px;
   background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06);
-  z-index: 200;
-  overflow: hidden;
-  animation: ds-drop-in 0.15s ease;
-}
-
-.ds-section-label {
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: #8a94a6;
-  padding: 10px 14px 6px;
-}
-
-.ds-list {
-  list-style: none;
-  margin: 0;
-  padding: 0 6px;
-}
-
-.ds-item {
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 12px;
+  box-shadow: 0 10px 32px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.06);
+  z-index: 1000;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 8px 10px;
-  border: none;
-  background: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 0.875rem;
-  color: #1a1f36;
-  text-align: left;
-  transition: background 0.12s;
-  gap: 8px;
+  flex-direction: column;
+  overflow: hidden;
+  animation: ds-drop-in 0.16s ease both;
 }
 
-.ds-item:hover {
-  background: #f4f6fb;
+/* ── Search bar ─────────────────────────────────────────────── */
+.ds-search-bar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #f0f2f4;
 }
 
-.ds-item.active {
+.ds-search-icon { color: #8a94a6; display: flex; flex-shrink: 0; }
+
+.ds-search-input {
+  flex: 1; border: none; outline: none; background: none;
+  font-family: inherit; font-size: 13px; color: #1a1f36;
+}
+.ds-search-input::placeholder { color: #a0aab4; }
+
+.ds-manage-link {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: none; border: none; padding: 0;
+  font-family: inherit; font-size: 12px; font-weight: 600;
+  color: var(--color-btn-primary-bg, #0e1f5b);
+  cursor: pointer; white-space: nowrap;
+  transition: opacity 0.15s;
+}
+.ds-manage-link:hover { opacity: 0.75; }
+
+/* ── Scrollable list area ───────────────────────────────────── */
+.ds-scroll { overflow-y: auto; max-height: 380px; padding: 6px 8px; }
+
+/* ── Group sections ─────────────────────────────────────────── */
+.ds-group { margin-bottom: 4px; }
+
+.ds-group-label {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.07em;
+  text-transform: uppercase; color: #8a94a6;
+  padding: 8px 8px 4px;
+}
+
+/* ── Dashboard items ────────────────────────────────────────── */
+.ds-item {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; padding: 9px 10px;
+  border: 1px solid transparent; border-radius: 8px;
+  background: none; cursor: pointer; font-family: inherit;
+  text-align: left; transition: background 0.12s, border-color 0.12s;
+}
+.ds-item:hover { background: #f4f6fb; }
+.ds-item--active {
   background: #eef1fa;
-  font-weight: 500;
+  border-color: var(--color-btn-primary-bg, #0e1f5b);
 }
+.ds-item--active:hover { background: #e8edf8; }
+
+.ds-item-pin {
+  color: #c7cdd1; display: flex; flex-shrink: 0;
+  transition: color 0.12s;
+}
+.ds-item:hover .ds-item-pin { color: #8a94a6; }
+
+.ds-item-icon {
+  width: 30px; height: 30px; border-radius: 6px;
+  background: #eef1fa; color: var(--color-btn-primary-bg, #0e1f5b);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.ds-item-icon--assigned {
+  background: #e8f5ee; color: #2e7d52;
+}
+
+.ds-item-text { flex: 1; min-width: 0; }
 
 .ds-item-name {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  display: flex; align-items: center; gap: 6px;
+  font-size: 13px; font-weight: 600; color: #1a1f36;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
-.ds-item-check {
+.ds-active-badge {
+  display: inline-flex; align-items: center; padding: 1px 7px;
+  background: var(--color-btn-primary-bg, #0e1f5b); color: #fff;
+  font-size: 10px; font-weight: 700; border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.ds-item-meta {
+  display: block; font-size: 11px; color: #8a94a6;
+  margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.ds-item-check { color: var(--color-btn-primary-bg, #0e1f5b); display: flex; align-items: center; flex-shrink: 0; }
+
+/* ── Empty state ────────────────────────────────────────────── */
+.ds-empty { padding: 16px 10px; font-size: 13px; color: #8a94a6; text-align: center; }
+
+/* ── Footer ─────────────────────────────────────────────────── */
+.ds-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px;
+  border-top: 1px solid #f0f2f4;
+}
+
+.ds-footer-link {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: none; border: none; padding: 0;
+  font-family: inherit; font-size: 12px; color: #8a94a6;
+  cursor: pointer; transition: color 0.15s;
+}
+.ds-footer-link:hover { color: #1a1f36; }
+
+.ds-footer-create {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: none; border: none; padding: 0;
+  font-family: inherit; font-size: 12px; font-weight: 600;
   color: var(--color-btn-primary-bg, #0e1f5b);
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
+  cursor: pointer; transition: opacity 0.15s;
 }
-
-.ds-divider {
-  height: 1px;
-  background: rgba(0, 0, 0, 0.08);
-  margin: 6px 0;
-}
-
-.ds-actions {
-  padding: 0 6px 6px;
-}
-
-.ds-action-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  padding: 8px 10px;
-  border: none;
-  background: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 0.875rem;
-  color: #1a1f36;
-  text-align: left;
-  transition: background 0.12s;
-}
-
-.ds-action-btn:hover {
-  background: #f4f6fb;
-}
-
-.ds-action-icon {
-  display: flex;
-  align-items: center;
-  color: #8a94a6;
-  flex-shrink: 0;
-}
+.ds-footer-create:hover { opacity: 0.75; }
 
 /* ── Animations ─────────────────────────────────────────────── */
-
-/* Single → mount */
-@keyframes ds-fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-/* Single → multi morph: slides in slightly from left and fades */
-@keyframes ds-morph-in {
-  from { opacity: 0; transform: translateX(-6px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-
-/* Dropdown open */
-@keyframes ds-drop-in {
-  from { opacity: 0; transform: translateY(-4px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+@keyframes ds-fade     { from { opacity:0 } to { opacity:1 } }
+@keyframes ds-morph-in { from { opacity:0; transform:translateX(-5px) } to { opacity:1; transform:none } }
+@keyframes ds-drop-in  { from { opacity:0; transform:translateY(-5px) } to { opacity:1; transform:none } }
