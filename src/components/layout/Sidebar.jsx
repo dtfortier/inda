@@ -71,19 +71,26 @@ const navItems = [
   { id: 'insights', icon: icons.barChart },
 ]
 
-const RESET_KEYS = [
-  'insights_dashboards_v2',
-  'insights_dashboards',
-  'insights_onboarding_config',
-]
-
 function handleReset() {
   const confirmed = window.confirm(
-    'Reset demo?\n\nThis will erase all dashboards and return to the onboarding flow. This cannot be undone.'
+    'Reset demo?\n\nThis will return you to the onboarding flow. Your existing dashboards will be restored when you complete onboarding.'
   )
   if (!confirmed) return
-  RESET_KEYS.forEach(k => localStorage.removeItem(k))
+
+  // Clear existing dashboard data and session
+  localStorage.removeItem('insights_dashboards_v2')
+  localStorage.removeItem('insights_dashboards')
+  localStorage.removeItem('insights_onboarding_config')
   sessionStorage.clear()
+
+  // Write a single empty dashboard so the app routes to onboarding
+  // instead of re-seeding the full demo set on reload
+  localStorage.setItem('insights_dashboards_v2', JSON.stringify([
+    { id: 'insights', name: 'Insights Dashboard', pinned: true,
+      audience: { id: 'myself', label: 'Myself' },
+      config: {}, updatedAt: Date.now() }
+  ]))
+
   window.location.reload()
 }
 
