@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { WIDGET_REGISTRY, MONITORING_CONDITIONS } from '../../data/widgetRegistry.jsx'
+import DataTable from './DataTable.jsx'
 import './EditWidgetModal.css'
 
 /* ── icons ─────────────────────────────────────────────────────────── */
@@ -166,12 +167,16 @@ function UnsavedChangesPrompt({ onSave, onDiscard, onCancel }) {
 
 /* ── Main modal ───────────────────────────────────────────────────── */
 
-export default function EditWidgetModal({ widgetId, currentRules, onClose, onRemove, onSave }) {
+export default function EditWidgetModal({ widgetId, currentRules, currentDisplayMode, onClose, onRemove, onSave }) {
   const def = widgetId ? WIDGET_REGISTRY[widgetId] : null
   const [tab, setTab] = useState('config')
   const [filterValues, setFilterValues] = useState({})
   const [rules, setRules] = useState([])
   const [showPrompt, setShowPrompt] = useState(false)
+  /* 'chart' or 'table' — which view shows as the widget's primary body
+     on the dashboard. Defaults to chart; table only available when the
+     widget has tableData configured in the registry. */
+  const [displayMode, setDisplayMode] = useState('chart')
 
   /* Seed the rules state from currentRules (saved by the user) when
      present, otherwise fall back to the registry's defaultMonitoring.
@@ -195,7 +200,8 @@ export default function EditWidgetModal({ widgetId, currentRules, onClose, onRem
     }
     setFilterValues(initialFilters)
     setRules(seedRules(def, currentRules))
-  }, [widgetId, def, currentRules])
+    setDisplayMode(currentDisplayMode === 'table' ? 'table' : 'chart')
+  }, [widgetId, def, currentRules, currentDisplayMode])
 
   const initialFilters = useMemo(() => {
     if (!def) return {}
@@ -209,13 +215,16 @@ export default function EditWidgetModal({ widgetId, currentRules, onClose, onRem
     [def, currentRules]
   )
 
-  /* `dirty` is true if filters or rules diverge from their initial
-     state. Used to gate the unsaved-changes prompt. */
+  const initialDisplayMode = currentDisplayMode === 'table' ? 'table' : 'chart'
+
+  /* `dirty` is true if filters, rules, or display mode diverge from
+     their initial state. Used to gate the unsaved-changes prompt. */
   const dirty = useMemo(() => {
     if (JSON.stringify(filterValues) !== JSON.stringify(initialFilters)) return true
     if (JSON.stringify(rules) !== JSON.stringify(initialRules)) return true
+    if (displayMode !== initialDisplayMode) return true
     return false
-  }, [filterValues, rules, initialFilters, initialRules])
+  }, [filterValues, rules, displayMode, initialFilters, initialRules, initialDisplayMode])
 
   if (!widgetId || !def) return null
 
@@ -248,15 +257,15 @@ export default function EditWidgetModal({ widgetId, currentRules, onClose, onRem
   }
 
   const handleSave = () => {
-    /* Persist rules through the parent so the dashboard reflects
-       changes (status badges + dynamic insight text) immediately. We
-       don't persist filter selections in this iteration — they're
-       UI-only for the live preview. */
+    /* Persist rules + display mode through the parent so the dashboard
+       reflects changes (status badges, dynamic insight text, chart-vs-
+       table rendering) immediately. Filter selections are still
+       preview-only in this iteration. */
     if (onSave) {
       /* Strip the React-internal `id` field; rules survive in storage
          identified by metric+condition+target. */
-      const cleaned = rules.map(({ id: _id, ...r }) => r)
-      onSave(cleaned)
+      const cleanedRules = rules.map(({ id: _id, ...r }) => r)
+      onSave({ rules: cleanedRules, displayMode })
     } else {
       onClose()
     }
@@ -312,28 +321,74 @@ export default function EditWidgetModal({ widgetId, currentRules, onClose, onRem
         </div>
 
         <div className="ewm-body">
-          {tab === 'config' && (
-            <>
-              <div className="ewm-section-label">Filters</div>
-              <div className="ewm-filter-grid">
-                {(def.filters || []).map((f) => (
-                  <FilterSelect
-                    key={f}
-                    filterKey={f}
-                    value={filterValues[f] || ''}
-                    onChange={(value) =>
-                      setFilterValues((prev) => ({ ...prev, [f]: value }))
-                    }
-                  />
-                ))}
-              </div>
+          {tab === 'config' && (() => {
+            /* A widget can render as a table only if the registry
+               has tableData configured. Otherwise the Table option in
+               the segmented control is disabled. */
+            const hasTableData = !!def.modal?.tableData
+            const tableData = (hasTableData && displayMode === 'table')
+              ? def.modal.tableData()
+              : null
+            return (
+              <>
+                <div className="ewm-section-label">Display as</div>
+                <div className="ewm-segmented" role="radiogroup" aria-label="Display as">
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={displayMode === 'chart'}
+                    className={`ewm-segmented-btn${displayMode === 'chart' ? ' active' : ''}`}
+                    onClick={() => setDisplayMode('chart')}
+                  >
+                    Chart
+                  </button>
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={displayMode === 'table'}
+                    className={`ewm-segmented-btn${displayMode === 'table' ? ' active' : ''}`}
+                    onClick={() => hasTableData && setDisplayMode('table')}
+                    disabled={!hasTableData}
+                    title={hasTableData ? '' : 'Table view not available for this widget yet'}
+                  >
+                    Table
+                  </button>
+                </div>
+                {!hasTableData && (
+                  <p className="ewm-helper-text" style={{ marginTop: 6 }}>
+                    Table view isn't available for this widget yet.
+                  </p>
+                )}
 
-              <div className="ewm-section-label" style={{ marginTop: 24 }}>Preview</div>
-              <div className="ewm-preview">
-                {def.render ? def.render() : <div className="ewm-preview-placeholder">No preview available.</div>}
-              </div>
-            </>
-          )}
+                <div className="ewm-section-label" style={{ marginTop: 24 }}>Filters</div>
+                <div className="ewm-filter-grid">
+                  {(def.filters || []).map((f) => (
+                    <FilterSelect
+                      key={f}
+                      filterKey={f}
+                      value={filterValues[f] || ''}
+                      onChange={(value) =>
+                        setFilterValues((prev) => ({ ...prev, [f]: value }))
+                      }
+                    />
+                  ))}
+                </div>
+
+                <div className="ewm-section-label" style={{ marginTop: 24 }}>Preview</div>
+                <div className="ewm-preview">
+                  {tableData ? (
+                    <div className="ewm-preview-table">
+                      <DataTable columns={tableData.columns} rows={tableData.rows.slice(0, 6)} />
+                    </div>
+                  ) : def.render ? (
+                    def.render()
+                  ) : (
+                    <div className="ewm-preview-placeholder">No preview available.</div>
+                  )}
+                </div>
+              </>
+            )
+          })()}
 
           {tab === 'monitoring' && (
             <>

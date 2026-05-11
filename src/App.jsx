@@ -157,6 +157,23 @@ function App() {
     updateActiveConfig((prev) => ({ ...(prev || {}), layout: newLayout }))
   }
 
+  /* Per-widget display preference: 'chart' (default) or 'table'.
+     Stored as { [widgetId]: 'chart'|'table' } on the active config.
+     'chart' values are stripped to keep storage small — absence means
+     chart, presence-of-'table' means table. */
+  const handleDisplayChange = (widgetId, mode) => {
+    updateActiveConfig((prev) => {
+      const prevDisplay = (prev && prev.display) || {}
+      const nextDisplay = { ...prevDisplay }
+      if (mode === 'table') {
+        nextDisplay[widgetId] = 'table'
+      } else {
+        delete nextDisplay[widgetId]
+      }
+      return { ...(prev || {}), display: nextDisplay }
+    })
+  }
+
   /* ── Dashboard navigation ── */
   const handleSwitchDashboard = (id) => {
     setActiveDashboardId(id)
@@ -271,6 +288,7 @@ function App() {
             onScopeChange={handleScopeChange}
             onMonitoringChange={handleMonitoringChange}
             onLayoutChange={handleLayoutChange}
+            onDisplayChange={handleDisplayChange}
           />
         )}
         {view === 'dashboard' && <Dashboard config={activeConfig} />}

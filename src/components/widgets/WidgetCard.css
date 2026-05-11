@@ -72,6 +72,15 @@
   min-height: 80px;
 }
 
+/* When the user has picked "Display as Table" for this widget the
+   body renders a DataTable instead of a chart. Cap height with
+   scroll so a long table doesn't push the rest of the card off the
+   page; the full table is still visible in the Dive Deeper modal. */
+.widget-table-body {
+  max-height: 260px;
+  overflow: auto;
+}
+
 /* AI Insight bar */
 .widget-insight {
   display: flex;

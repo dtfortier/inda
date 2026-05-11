@@ -225,6 +225,52 @@
   color: var(--color-text-muted);
 }
 
+/* The data table in preview is potentially tall; cap height with
+   scroll so the modal body doesn't grow unbounded. */
+.ewm-preview-table {
+  max-height: 260px;
+  overflow: auto;
+}
+
+/* ── Segmented control (Display as Chart / Table) ── */
+.ewm-segmented {
+  display: inline-flex;
+  border: 1px solid #c7cdd1;
+  border-radius: 999px;
+  padding: 3px;
+  background: var(--color-bg-container);
+  gap: 2px;
+}
+
+.ewm-segmented-btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease;
+}
+
+.ewm-segmented-btn:hover:not(:disabled):not(.active) {
+  background: #eef4fd;
+  color: var(--color-btn-primary-bg);
+}
+
+.ewm-segmented-btn.active {
+  background: var(--color-btn-primary-bg);
+  color: var(--color-btn-primary-text);
+}
+
+.ewm-segmented-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 /* ── Monitoring rules ── */
 .ewm-rules {
   display: flex;

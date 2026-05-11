@@ -22,8 +22,10 @@ function GripIcon() {
    registry, in edit mode. Drag-and-drop logic stays the same.
 
    Now controlled: the parent passes `layout` and `onLayoutChange` so
-   the layout can be persisted on Save and discarded on Cancel. */
-export function CustomizeBoard({ layout, onLayoutChange, onEditWidget, monitoring }) {
+   the layout can be persisted on Save and discarded on Cancel.
+   `display` is the per-widget chart/table preference, so edit-mode
+   previews match what the saved dashboard actually shows. */
+export function CustomizeBoard({ layout, onLayoutChange, onEditWidget, monitoring, display }) {
   const [drag, setDrag] = useState(null)
   const [over, setOver] = useState(null)
 
@@ -122,6 +124,7 @@ export function CustomizeBoard({ layout, onLayoutChange, onEditWidget, monitorin
       <div className={sizeClass} key={`${item.id}-${index}`}>
         {renderRegistryWidget(item.id, {
           monitoring,
+          display,
           editMode: true,
           onEdit: () => onEditWidget?.(item.id),
           onRemove: removeFromColumn(column, index),
@@ -223,7 +226,7 @@ export function CustomizeBoard({ layout, onLayoutChange, onEditWidget, monitorin
   )
 }
 
-export default function Customize({ onClose, config, onScopeChange, onMonitoringChange, onLayoutChange }) {
+export default function Customize({ onClose, config, onScopeChange, onMonitoringChange, onLayoutChange, onDisplayChange }) {
   const [isEditScopeOpen, setEditScopeOpen] = useState(false)
   const [editingWidgetId, setEditingWidgetId] = useState(null)
 
@@ -239,13 +242,19 @@ export default function Customize({ onClose, config, onScopeChange, onMonitoring
     setEditScopeOpen(false)
   }
 
-  const handleSaveMonitoring = (widgetId, rules) => {
-    if (onMonitoringChange) onMonitoringChange(widgetId, rules)
+  /* EditWidgetModal now hands back both rules and display mode in a
+     single payload — split them and persist each through the right
+     handler. Either side may be missing if a parent didn't wire it
+     up, so guard with checks. */
+  const handleSaveWidgetEdits = (widgetId, payload) => {
+    const { rules, displayMode } = payload || {}
+    if (rules !== undefined && onMonitoringChange) onMonitoringChange(widgetId, rules)
+    if (displayMode !== undefined && onDisplayChange) onDisplayChange(widgetId, displayMode)
     setEditingWidgetId(null)
   }
 
-  /* Commit pending layout changes (if any) and exit. Scope and
-     monitoring already persist immediately when their modals close,
+  /* Commit pending layout changes (if any) and exit. Scope, monitoring,
+     and display already persist immediately when their modals close,
      so this only needs to flush layout. */
   const handleSaveChanges = () => {
     if (onLayoutChange) onLayoutChange(layout)
@@ -279,6 +288,7 @@ export default function Customize({ onClose, config, onScopeChange, onMonitoring
         onLayoutChange={setLayout}
         onEditWidget={setEditingWidgetId}
         monitoring={config?.monitoring}
+        display={config?.display}
       />
 
       <EditScopeModal
@@ -294,7 +304,10 @@ export default function Customize({ onClose, config, onScopeChange, onMonitoring
         currentRules={
           editingWidgetId ? config?.monitoring?.[editingWidgetId] : undefined
         }
-        onSave={(rules) => handleSaveMonitoring(editingWidgetId, rules)}
+        currentDisplayMode={
+          editingWidgetId ? config?.display?.[editingWidgetId] : undefined
+        }
+        onSave={(payload) => handleSaveWidgetEdits(editingWidgetId, payload)}
         onClose={() => setEditingWidgetId(null)}
         onRemove={() => {
           /* Deferred — the prototype removes via the X on the card. */
