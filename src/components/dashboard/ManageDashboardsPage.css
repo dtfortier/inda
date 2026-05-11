@@ -1,12 +1,20 @@
 /* ── Page shell ─────────────────────────────────────────────── */
 .mdp-page {
-  min-height: 100vh;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
   background: #f8f9fb;
-  padding: 24px 40px 48px;
   font-family: var(--font-body, system-ui, sans-serif);
   color: var(--color-text-primary, #1a1f36);
+}
+
+.mdp-page::-webkit-scrollbar { display: none; }
+
+.mdp-page-inner {
   max-width: 1280px;
   margin: 0 auto;
+  padding: 24px 40px 48px;
 }
 
 /* ── Back link ──────────────────────────────────────────────── */
@@ -144,7 +152,6 @@
 
 .mdp-row:last-child { border-bottom: none; }
 .mdp-row:hover { background: #fafbfd; }
-
 .mdp-row--active { background: #f4f7fe; }
 .mdp-row--active:hover { background: #eef3fd; }
 
@@ -186,7 +193,6 @@
 
 .mdp-row-meta { font-size: 12px; color: #8a94a6; margin-top: 2px; }
 
-.mdp-row-updated { }
 .mdp-row-updated-date { font-size: 13px; color: #1a1f36; }
 .mdp-row-updated-by  { font-size: 11px; color: #8a94a6; margin-top: 1px; }
 
@@ -216,8 +222,7 @@
 .mdp-rename-save, .mdp-rename-cancel {
   height: 28px; padding: 0 10px; border-radius: 6px;
   font-family: inherit; font-size: 12px; font-weight: 600;
-  cursor: pointer; border: 1px solid transparent;
-  white-space: nowrap;
+  cursor: pointer; border: 1px solid transparent; white-space: nowrap;
 }
 .mdp-rename-save { background: var(--color-btn-primary-bg,#0e1f5b); color: #fff; border-color: var(--color-btn-primary-bg,#0e1f5b); }
 .mdp-rename-cancel { background: #f1f5f9; border-color: #c7cdd1; color: #1a1f36; }
@@ -247,12 +252,16 @@
   justify-content: center; margin-top: 32px;
   font-size: 12px; color: #8a94a6;
 }
-.mdp-learn-more { background: none; border: none; padding: 0; font-family: inherit; font-size: 12px; font-weight: 600; color: var(--color-btn-primary-bg,#0e1f5b); cursor: pointer; }
+.mdp-learn-more {
+  background: none; border: none; padding: 0;
+  font-family: inherit; font-size: 12px; font-weight: 600;
+  color: var(--color-btn-primary-bg,#0e1f5b); cursor: pointer;
+}
 .mdp-learn-more:hover { opacity: 0.7; }
 
 /* ── Responsive ─────────────────────────────────────────────── */
 @media (max-width: 900px) {
-  .mdp-page { padding: 16px 20px 40px; }
+  .mdp-page-inner { padding: 16px 20px 40px; }
   .mdp-table-header { grid-template-columns: 40px 32px 1fr 100px; }
   .mdp-row { grid-template-columns: 40px 32px 1fr 100px; }
   .mdp-th-actions, .mdp-row-actions { display: none; }

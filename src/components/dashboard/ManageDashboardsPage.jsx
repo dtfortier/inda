@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import './ManageDashboardsPage.css'
 
-/* ── Icons ─────────────────────────────────────────────────── */
 const ArrowLeftIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>
@@ -38,7 +37,9 @@ const TrashIcon = () => (
 )
 const MoreIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="5" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="12" cy="19" r="1" fill="currentColor"/>
+    <circle cx="12" cy="5" r="1" fill="currentColor"/>
+    <circle cx="12" cy="12" r="1" fill="currentColor"/>
+    <circle cx="12" cy="19" r="1" fill="currentColor"/>
   </svg>
 )
 const GridIcon = () => (
@@ -70,7 +71,6 @@ const InfoIcon = () => (
   </svg>
 )
 
-/* ── Helpers ────────────────────────────────────────────────── */
 function formatDate(ts) {
   if (!ts) return '—'
   return new Date(ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
@@ -81,7 +81,6 @@ function scopeCount(d) {
   return Object.values(scope).reduce((sum, arr) => sum + (Array.isArray(arr) ? arr.length : 0), 0)
 }
 
-/* ── Inline rename ──────────────────────────────────────────── */
 function RenameCell({ value, onSave, onCancel }) {
   const [draft, setDraft] = useState(value)
   return (
@@ -103,7 +102,6 @@ function RenameCell({ value, onSave, onCancel }) {
   )
 }
 
-/* ── Delete confirmation row ────────────────────────────────── */
 function DeleteConfirm({ name, onConfirm, onCancel }) {
   return (
     <div className="mdp-delete-confirm">
@@ -116,7 +114,6 @@ function DeleteConfirm({ name, onConfirm, onCancel }) {
   )
 }
 
-/* ── Dashboard row ──────────────────────────────────────────── */
 function DashboardRow({ dashboard, isActive, isOnly, isAssigned, onSwitch, onRename, onPin, onDuplicate, onDelete }) {
   const [renaming, setRenaming]     = useState(false)
   const [confirming, setConfirming] = useState(false)
@@ -125,22 +122,16 @@ function DashboardRow({ dashboard, isActive, isOnly, isAssigned, onSwitch, onRen
   return (
     <>
       <div className={`mdp-row${isActive ? ' mdp-row--active' : ''}`}>
-        {/* Icon */}
         <div className={`mdp-row-icon${isAssigned ? ' mdp-row-icon--assigned' : ''}`}>
           {isAssigned ? <UserPlusIcon /> : <GridIcon />}
         </div>
-
-        {/* Star/pin */}
         <button
           className={`mdp-star-btn${dashboard.pinned ? ' mdp-star-btn--on' : ''}`}
           onClick={() => onPin(dashboard.id)}
-          aria-label={dashboard.pinned ? 'Unpin dashboard' : 'Pin dashboard'}
-          title={dashboard.pinned ? 'Unpin' : 'Pin to top'}
+          aria-label={dashboard.pinned ? 'Unpin' : 'Pin to top'}
         >
           <StarIcon filled={dashboard.pinned} />
         </button>
-
-        {/* Name + meta */}
         <div className="mdp-row-info">
           {renaming ? (
             <RenameCell
@@ -161,36 +152,24 @@ function DashboardRow({ dashboard, isActive, isOnly, isAssigned, onSwitch, onRen
             }
           </div>
         </div>
-
-        {/* Last updated */}
         <div className="mdp-row-updated">
           <div className="mdp-row-updated-date">{formatDate(dashboard.updatedAt)}</div>
           <div className="mdp-row-updated-by">by you</div>
         </div>
-
-        {/* Actions */}
         <div className="mdp-row-actions">
-          <button className="mdp-action-btn" onClick={() => setRenaming(true)} title="Rename" aria-label="Rename">
-            <EditIcon />
-          </button>
-          <button className="mdp-action-btn" onClick={() => onDuplicate(dashboard.id)} title="Duplicate" aria-label="Duplicate">
-            <CopyIcon />
-          </button>
+          <button className="mdp-action-btn" onClick={() => setRenaming(true)} title="Rename"><EditIcon /></button>
+          <button className="mdp-action-btn" onClick={() => onDuplicate(dashboard.id)} title="Duplicate"><CopyIcon /></button>
           <button
             className={`mdp-action-btn mdp-action-btn--danger${isOnly ? ' mdp-action-btn--disabled' : ''}`}
             onClick={() => !isOnly && setConfirming(true)}
-            title={isOnly ? "Can't delete the only dashboard" : 'Delete'}
-            aria-label="Delete"
             disabled={isOnly}
+            title={isOnly ? "Can't delete the only dashboard" : 'Delete'}
           >
             <TrashIcon />
           </button>
-          <button className="mdp-action-btn" title="More actions" aria-label="More actions">
-            <MoreIcon />
-          </button>
+          <button className="mdp-action-btn" title="More actions"><MoreIcon /></button>
         </div>
       </div>
-
       {confirming && (
         <DeleteConfirm
           name={dashboard.name}
@@ -202,7 +181,6 @@ function DashboardRow({ dashboard, isActive, isOnly, isAssigned, onSwitch, onRen
   )
 }
 
-/* ── Section ────────────────────────────────────────────────── */
 function Section({ title, subtitle, count, icon, dashboards, activeDashboardId, isOnly, collapsible, onSwitch, onRename, onPin, onDuplicate, onDelete }) {
   const [collapsed, setCollapsed] = useState(false)
   const isAssigned = title.toLowerCase().includes('assigned')
@@ -210,9 +188,7 @@ function Section({ title, subtitle, count, icon, dashboards, activeDashboardId, 
   return (
     <div className="mdp-section">
       <div className="mdp-section-header">
-        <div className={`mdp-section-icon${isAssigned ? ' mdp-section-icon--assigned' : ''}`}>
-          {icon}
-        </div>
+        <div className={`mdp-section-icon${isAssigned ? ' mdp-section-icon--assigned' : ''}`}>{icon}</div>
         <div className="mdp-section-heading">
           <h2 className="mdp-section-title">{title} <span className="mdp-section-count">({count})</span></h2>
           <p className="mdp-section-subtitle">{subtitle}</p>
@@ -223,7 +199,6 @@ function Section({ title, subtitle, count, icon, dashboards, activeDashboardId, 
           </button>
         )}
       </div>
-
       {!collapsed && (
         <div className="mdp-table">
           <div className="mdp-table-header">
@@ -253,7 +228,6 @@ function Section({ title, subtitle, count, icon, dashboards, activeDashboardId, 
   )
 }
 
-/* ── Main page ──────────────────────────────────────────────── */
 export default function ManageDashboardsPage({
   dashboards, activeDashboardId,
   onBack, onSwitch, onCreate,
@@ -262,7 +236,7 @@ export default function ManageDashboardsPage({
   const [query,  setQuery]  = useState('')
   const [sortBy, setSortBy] = useState('updatedAt')
 
-  const filterFn = (d) => d.name.toLowerCase().includes(query.toLowerCase())
+  const filterFn = d => d.name.toLowerCase().includes(query.toLowerCase())
 
   const myDashboards = dashboards
     .filter(d => !d.audience || d.audience.id === 'myself')
@@ -280,99 +254,75 @@ export default function ManageDashboardsPage({
 
   return (
     <div className="mdp-page">
-      {/* Back link */}
-      <button className="mdp-back" onClick={onBack}>
-        <ArrowLeftIcon /> Back to dashboard
-      </button>
+      <div className="mdp-page-inner">
+        <button className="mdp-back" onClick={onBack}>
+          <ArrowLeftIcon /> Back to dashboard
+        </button>
 
-      {/* Page header */}
-      <div className="mdp-page-header">
-        <div className="mdp-page-header-text">
-          <h1 className="mdp-page-title">Manage dashboards</h1>
-          <p className="mdp-page-subtitle">View, organize, and manage all dashboards you've created.</p>
+        <div className="mdp-page-header">
+          <div className="mdp-page-header-text">
+            <h1 className="mdp-page-title">Manage dashboards</h1>
+            <p className="mdp-page-subtitle">View, organize, and manage all dashboards you've created.</p>
+          </div>
+          <div className="mdp-page-header-actions">
+            <button className="mdp-btn mdp-btn--primary" onClick={onCreate}>
+              <PlusIcon /> Create new dashboard
+            </button>
+            <button className="mdp-btn mdp-btn--secondary">
+              <MoreIcon /> More actions
+            </button>
+          </div>
         </div>
-        <div className="mdp-page-header-actions">
-          <button className="mdp-btn mdp-btn--primary" onClick={onCreate}>
-            <PlusIcon /> Create new dashboard
-          </button>
-          <button className="mdp-btn mdp-btn--secondary">
-            <MoreIcon /> More actions
-          </button>
+
+        <div className="mdp-toolbar">
+          <div className="mdp-search-wrap">
+            <span className="mdp-search-icon"><SearchIcon /></span>
+            <input
+              className="mdp-search-input"
+              placeholder="Search dashboards…"
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+            />
+          </div>
+          <div className="mdp-toolbar-right">
+            <select className="mdp-select" value={sortBy} onChange={e => setSortBy(e.target.value)}>
+              <option value="updatedAt">Sort by: Last updated</option>
+              <option value="name">Sort by: Name</option>
+            </select>
+          </div>
         </div>
-      </div>
 
-      {/* Toolbar */}
-      <div className="mdp-toolbar">
-        <div className="mdp-search-wrap">
-          <span className="mdp-search-icon"><SearchIcon /></span>
-          <input
-            className="mdp-search-input"
-            placeholder="Search dashboards…"
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-          />
+        <div className="mdp-sections">
+          {myDashboards.length > 0 && (
+            <Section
+              title="My dashboards" subtitle="Dashboards created for yourself."
+              count={myDashboards.length} icon={<GridIcon />}
+              dashboards={myDashboards} activeDashboardId={activeDashboardId}
+              isOnly={isOnly} collapsible={false}
+              onSwitch={handleSwitch} onRename={onRename} onPin={onPin}
+              onDuplicate={onDuplicate} onDelete={onDelete}
+            />
+          )}
+          {assignedDashboards.length > 0 && (
+            <Section
+              title="Assigned dashboards" subtitle="Dashboards created for other users."
+              count={assignedDashboards.length} icon={<UserPlusIcon />}
+              dashboards={assignedDashboards} activeDashboardId={activeDashboardId}
+              isOnly={isOnly} collapsible={true}
+              onSwitch={handleSwitch} onRename={onRename} onPin={onPin}
+              onDuplicate={onDuplicate} onDelete={onDelete}
+            />
+          )}
+          {query && myDashboards.length === 0 && assignedDashboards.length === 0 && (
+            <div className="mdp-empty">No dashboards match "{query}"</div>
+          )}
         </div>
-        <div className="mdp-toolbar-right">
-          <select
-            className="mdp-select"
-            value={sortBy}
-            onChange={e => setSortBy(e.target.value)}
-            aria-label="Sort by"
-          >
-            <option value="updatedAt">Sort by: Last updated</option>
-            <option value="name">Sort by: Name</option>
-          </select>
+
+        <div className="mdp-page-footer">
+          <InfoIcon />
+          Can't find a dashboard? You may not have access to it or it may have been archived.{' '}
+          <button className="mdp-learn-more">Learn more</button>
         </div>
-      </div>
-
-      {/* Sections */}
-      <div className="mdp-sections">
-        {myDashboards.length > 0 && (
-          <Section
-            title="My dashboards"
-            subtitle="Dashboards created for yourself."
-            count={myDashboards.length}
-            icon={<GridIcon />}
-            dashboards={myDashboards}
-            activeDashboardId={activeDashboardId}
-            isOnly={isOnly}
-            collapsible={false}
-            onSwitch={handleSwitch}
-            onRename={onRename}
-            onPin={onPin}
-            onDuplicate={onDuplicate}
-            onDelete={onDelete}
-          />
-        )}
-
-        {assignedDashboards.length > 0 && (
-          <Section
-            title="Assigned dashboards"
-            subtitle="Dashboards created for other users."
-            count={assignedDashboards.length}
-            icon={<UserPlusIcon />}
-            dashboards={assignedDashboards}
-            activeDashboardId={activeDashboardId}
-            isOnly={isOnly}
-            collapsible={true}
-            onSwitch={handleSwitch}
-            onRename={onRename}
-            onPin={onPin}
-            onDuplicate={onDuplicate}
-            onDelete={onDelete}
-          />
-        )}
-
-        {query && myDashboards.length === 0 && assignedDashboards.length === 0 && (
-          <div className="mdp-empty">No dashboards match "{query}"</div>
-        )}
-      </div>
-
-      {/* Footer note */}
-      <div className="mdp-page-footer">
-        <InfoIcon />
-        Can't find a dashboard? You may not have access to it or it may have been archived.{' '}
-        <button className="mdp-learn-more">Learn more</button>
       </div>
     </div>
   )
