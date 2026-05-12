@@ -83,6 +83,8 @@
   width: 100%;
   margin: 0 auto 24px;
   gap: 32px;
+  position: relative;
+  z-index: 100;
 }
 
 .customize-heading {
@@ -441,7 +443,7 @@
   border-radius: 10px;
   box-shadow: 0 8px 24px rgba(0,0,0,0.12);
   padding: 6px;
-  z-index: 200;
+  z-index: 1000;
   animation: cust-drop 0.15s ease both;
 }
 
