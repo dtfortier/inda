@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Dashboard from './Dashboard.jsx'
 import { FOCUS_AREAS, SCOPE_FIELDS, SCOPE_OPTIONS, AUTO_RECOMMENDATIONS } from '../data/mock/onboardingOptions.js'
+import { isLiveField, getLiveCountLabel } from '../data/mock/scopeGraph.js'
 import './Onboarding.css'
 
 /* Auto mode inserts an "analyzing" step (process + loading animation)
@@ -252,7 +253,7 @@ function StepFocus({ focusAreas, toggleFocus, mode, stepNumber, stepCount }) {
 }
 
 /* ───────── STEP 3 ───────── */
-function ScopePicker({ field, selected, suggestedValues = [], onAdd, onRemove }) {
+function ScopePicker({ field, scope, selected, suggestedValues = [], onAdd, onRemove }) {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
   /* Separate state + ref for the info popover so opening it doesn't
@@ -282,6 +283,7 @@ function ScopePicker({ field, selected, suggestedValues = [], onAdd, onRemove })
   /* `selected` is still an array of plain strings (the chosen values),
      so we filter the {value, meta} option objects by their .value. */
   const available = all.filter((o) => !selected.includes(o.value))
+  const liveField = isLiveField(field.key)
 
   return (
     <div className="scope-field">
@@ -310,6 +312,9 @@ function ScopePicker({ field, selected, suggestedValues = [], onAdd, onRemove })
         {selected.map((value) => (
           <span key={value} className={`scope-chip${suggestedValues.includes(value) ? ' suggested' : ' added'}`}>
             {value}
+            {liveField && (
+              <span className="scope-chip-count">{getLiveCountLabel(field.key, value, scope)}</span>
+            )}
             <button
               type="button"
               className="scope-chip-remove"
@@ -330,22 +335,27 @@ function ScopePicker({ field, selected, suggestedValues = [], onAdd, onRemove })
               {available.length === 0 ? (
                 <div className="scope-popover-empty">All options added</div>
               ) : (
-                available.map((option) => (
-                  <button
-                    key={option.value}
-                    type="button"
-                    className="scope-popover-item"
-                    onClick={() => {
-                      onAdd(field.key, option.value)
-                      setOpen(false)
-                    }}
-                  >
-                    <div className="scope-popover-item-name">{option.value}</div>
-                    {option.meta && (
-                      <div className="scope-popover-item-meta">{option.meta}</div>
-                    )}
-                  </button>
-                ))
+                available.map((option) => {
+                  const meta = liveField
+                    ? getLiveCountLabel(field.key, option.value, scope)
+                    : option.meta
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      className="scope-popover-item"
+                      onClick={() => {
+                        onAdd(field.key, option.value)
+                        setOpen(false)
+                      }}
+                    >
+                      <div className="scope-popover-item-name">{option.value}</div>
+                      {meta && (
+                        <div className="scope-popover-item-meta">{meta}</div>
+                      )}
+                    </button>
+                  )
+                })
               )}
             </div>
           )}
@@ -382,6 +392,7 @@ function StepScope({ scope, setScope, suggestedScope, mode, stepNumber, stepCoun
         <ScopePicker
           key={field.key}
           field={field}
+          scope={scope}
           selected={scope[field.key] || []}
           suggestedValues={suggestedScope?.[field.key] || []}
           onAdd={addValue}
@@ -441,12 +452,13 @@ export default function Onboarding({ onComplete, onEditDashboard, initialConfig 
   const [scope, setScope] = useState(
     initialConfig?.scope || {
       subAccounts: [],
-      term: [],
-      studentGroups: [],
-      courses: [],
       courseGroups: [],
-      instructors: [],
+      term: [],
+      cohorts: [],
+      tags: [],
       modality: [],
+      instructors: [],
+      courses: [],
     }
   )
   /* Tracks which scope values were pre-filled by Canvas (auto mode) so
@@ -457,12 +469,13 @@ export default function Onboarding({ onComplete, onEditDashboard, initialConfig 
     initialConfig?.mode === 'auto'
       ? {
           subAccounts: [...AUTO_RECOMMENDATIONS.scope.subAccounts],
-          term: [...AUTO_RECOMMENDATIONS.scope.term],
-          studentGroups: [...AUTO_RECOMMENDATIONS.scope.studentGroups],
-          courses: [...AUTO_RECOMMENDATIONS.scope.courses],
           courseGroups: [...AUTO_RECOMMENDATIONS.scope.courseGroups],
-          instructors: [...AUTO_RECOMMENDATIONS.scope.instructors],
+          term: [...AUTO_RECOMMENDATIONS.scope.term],
+          cohorts: [...AUTO_RECOMMENDATIONS.scope.cohorts],
+          tags: [...AUTO_RECOMMENDATIONS.scope.tags],
           modality: [...AUTO_RECOMMENDATIONS.scope.modality],
+          instructors: [...AUTO_RECOMMENDATIONS.scope.instructors],
+          courses: [...AUTO_RECOMMENDATIONS.scope.courses],
         }
       : {}
   )
@@ -480,21 +493,23 @@ export default function Onboarding({ onComplete, onEditDashboard, initialConfig 
     if (scopeEmpty) {
       setScope({
         subAccounts: [...AUTO_RECOMMENDATIONS.scope.subAccounts],
-        term: [...AUTO_RECOMMENDATIONS.scope.term],
-        studentGroups: [...AUTO_RECOMMENDATIONS.scope.studentGroups],
-        courses: [...AUTO_RECOMMENDATIONS.scope.courses],
         courseGroups: [...AUTO_RECOMMENDATIONS.scope.courseGroups],
-        instructors: [...AUTO_RECOMMENDATIONS.scope.instructors],
+        term: [...AUTO_RECOMMENDATIONS.scope.term],
+        cohorts: [...AUTO_RECOMMENDATIONS.scope.cohorts],
+        tags: [...AUTO_RECOMMENDATIONS.scope.tags],
         modality: [...AUTO_RECOMMENDATIONS.scope.modality],
+        instructors: [...AUTO_RECOMMENDATIONS.scope.instructors],
+        courses: [...AUTO_RECOMMENDATIONS.scope.courses],
       })
       setSuggestedScope({
         subAccounts: [...AUTO_RECOMMENDATIONS.scope.subAccounts],
-        term: [...AUTO_RECOMMENDATIONS.scope.term],
-        studentGroups: [...AUTO_RECOMMENDATIONS.scope.studentGroups],
-        courses: [...AUTO_RECOMMENDATIONS.scope.courses],
         courseGroups: [...AUTO_RECOMMENDATIONS.scope.courseGroups],
-        instructors: [...AUTO_RECOMMENDATIONS.scope.instructors],
+        term: [...AUTO_RECOMMENDATIONS.scope.term],
+        cohorts: [...AUTO_RECOMMENDATIONS.scope.cohorts],
+        tags: [...AUTO_RECOMMENDATIONS.scope.tags],
         modality: [...AUTO_RECOMMENDATIONS.scope.modality],
+        instructors: [...AUTO_RECOMMENDATIONS.scope.instructors],
+        courses: [...AUTO_RECOMMENDATIONS.scope.courses],
       })
     }
   }
@@ -577,12 +592,13 @@ export default function Onboarding({ onComplete, onEditDashboard, initialConfig 
                 setFocusAreas([])
                 setScope({
                   subAccounts: [],
-                  term: [],
-                  studentGroups: [],
-                  courses: [],
                   courseGroups: [],
-                  instructors: [],
+                  term: [],
+                  cohorts: [],
+                  tags: [],
                   modality: [],
+                  instructors: [],
+                  courses: [],
                 })
                 setSuggestedScope({})
               }}

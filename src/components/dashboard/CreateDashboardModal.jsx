@@ -9,13 +9,14 @@ const MYSELF = {
   role: 'Administrator',
   access: 'Full access · All permissions',
   permissions: {
-    subAccounts:   { count: 5,  total: 5,  label: '5 of 5' },
-    term:          { count: 3,  total: 3,  label: '3 of 3' },
-    studentGroups: { count: 12, total: 12, label: '12 of 12' },
-    courses:       { count: null, label: 'All' },
-    courseGroups:  { count: null, label: 'All' },
-    instructors:   { count: null, label: 'All' },
-    modality:      { count: null, label: 'All' },
+    subAccounts:  { count: 5,  total: 5,  label: '5 of 5' },
+    term:         { count: 3,  total: 3,  label: '3 of 3' },
+    cohorts:      { count: 12, total: 12, label: '12 of 12' },
+    tags:         { count: 10, total: 10, label: '10 of 10' },
+    courses:      { count: null, label: 'All' },
+    courseGroups: { count: null, label: 'All' },
+    instructors:  { count: null, label: 'All' },
+    modality:     { count: null, label: 'All' },
   },
 }
 
@@ -26,13 +27,14 @@ const OTHER_USERS = [
     role: 'Advisor · College of Science',
     access: 'Limited access',
     permissions: {
-      subAccounts:   { count: 1, total: 5,  label: '1 of 5' },
-      term:          { count: 1, total: 3,  label: '1 of 3' },
-      studentGroups: { count: 3, total: 12, label: '3 of 12' },
-      courses:       { count: null, label: 'Limited' },
-      courseGroups:  { count: null, label: 'Limited' },
-      instructors:   { count: null, label: 'None' },
-      modality:      { count: null, label: 'All' },
+      subAccounts:  { count: 1, total: 5,  label: '1 of 5' },
+      term:         { count: 1, total: 3,  label: '1 of 3' },
+      cohorts:      { count: 3, total: 12, label: '3 of 12' },
+      tags:         { count: 2, total: 10, label: '2 of 10' },
+      courses:      { count: null, label: 'Limited' },
+      courseGroups: { count: null, label: 'Limited' },
+      instructors:  { count: null, label: 'None' },
+      modality:     { count: null, label: 'All' },
     },
   },
   {
@@ -41,13 +43,14 @@ const OTHER_USERS = [
     role: 'Dean · College of Business',
     access: 'Partial access',
     permissions: {
-      subAccounts:   { count: 2, total: 5,  label: '2 of 5' },
-      term:          { count: 3, total: 3,  label: '3 of 3' },
-      studentGroups: { count: 8, total: 12, label: '8 of 12' },
-      courses:       { count: null, label: 'All' },
-      courseGroups:  { count: null, label: 'Limited' },
-      instructors:   { count: null, label: 'All' },
-      modality:      { count: null, label: 'All' },
+      subAccounts:  { count: 2, total: 5,  label: '2 of 5' },
+      term:         { count: 3, total: 3,  label: '3 of 3' },
+      cohorts:      { count: 8, total: 12, label: '8 of 12' },
+      tags:         { count: 7, total: 10, label: '7 of 10' },
+      courses:      { count: null, label: 'All' },
+      courseGroups: { count: null, label: 'Limited' },
+      instructors:  { count: null, label: 'All' },
+      modality:     { count: null, label: 'All' },
     },
   },
   {
@@ -56,25 +59,27 @@ const OTHER_USERS = [
     role: 'Faculty · Department of Biology',
     access: 'Limited access',
     permissions: {
-      subAccounts:   { count: 1, total: 5,  label: '1 of 5' },
-      term:          { count: 2, total: 3,  label: '2 of 3' },
-      studentGroups: { count: 2, total: 12, label: '2 of 12' },
-      courses:       { count: null, label: 'Limited' },
-      courseGroups:  { count: null, label: 'None' },
-      instructors:   { count: null, label: 'None' },
-      modality:      { count: null, label: 'Limited' },
+      subAccounts:  { count: 1, total: 5,  label: '1 of 5' },
+      term:         { count: 2, total: 3,  label: '2 of 3' },
+      cohorts:      { count: 2, total: 12, label: '2 of 12' },
+      tags:         { count: 1, total: 10, label: '1 of 10' },
+      courses:      { count: null, label: 'Limited' },
+      courseGroups: { count: null, label: 'None' },
+      instructors:  { count: null, label: 'None' },
+      modality:     { count: null, label: 'Limited' },
     },
   },
 ]
 
 const PERMISSION_ROWS = [
-  { key: 'subAccounts',   label: 'Sub accounts' },
-  { key: 'term',          label: 'Terms' },
-  { key: 'studentGroups', label: 'Student groups' },
-  { key: 'courses',       label: 'Courses' },
-  { key: 'courseGroups',  label: 'Course groups' },
-  { key: 'instructors',   label: 'Instructors' },
-  { key: 'modality',      label: 'Modalities' },
+  { key: 'subAccounts',  label: 'Sub accounts' },
+  { key: 'term',         label: 'Terms' },
+  { key: 'cohorts',      label: 'Cohorts' },
+  { key: 'tags',         label: 'Tags' },
+  { key: 'courses',      label: 'Courses' },
+  { key: 'courseGroups', label: 'Course groups' },
+  { key: 'instructors',  label: 'Instructors' },
+  { key: 'modality',     label: 'Modalities' },
 ]
 
 const DEFAULT_WIDGETS = [
@@ -98,7 +103,7 @@ const ALL_OPTIONS = {
     { value: 'Fall 2024' },
     { value: 'Winter 2025' },
   ],
-  studentGroups: [
+  cohorts: [
     { value: 'First-generation Students', meta: '892 students' },
     { value: 'Transfer Students',         meta: '341 students' },
     { value: 'Student Athletes',          meta: '215 students' },
@@ -107,6 +112,12 @@ const ALL_OPTIONS = {
     { value: 'Biology Majors',            meta: '203 students' },
     { value: 'Undecided/Exploratory',     meta: '312 students' },
     { value: 'Honor Students',            meta: '189 students' },
+  ],
+  tags: [
+    { value: 'Female',                meta: '4,812 students' },
+    { value: 'Pell Grant Recipient',  meta: '3,105 students' },
+    { value: "Dean's List",           meta: '1,467 students' },
+    { value: 'Work-Study Employed',   meta: '1,802 students' },
   ],
   courses:       [
     { value: 'BIO 101',  meta: '28 students' },
@@ -352,13 +363,14 @@ function StepDetails({ form, onChange, audience, onAudienceChange }) {
 /* ── Step 2: Define scope ──────────────────────────────────── */
 
 const SCOPE_FIELDS = [
-  { key: 'subAccounts',   label: 'Sub Accounts',  description: 'Divisions or colleges within your institution. Select one or more to limit your dashboard to those areas.' },
-  { key: 'term',          label: 'Term',           description: "The academic term or semester you want to focus on. Select one or more to filter your dashboard's data." },
-  { key: 'studentGroups', label: 'Student Groups', description: 'Groups of students your institution has defined. Select one or more to focus your dashboard on those students.' },
-  { key: 'courses',       label: 'Courses',        description: 'Individual courses offered at your institution. Select one or more to narrow your dashboard.' },
-  { key: 'courseGroups',  label: 'Course Groups',  description: 'Groups of courses your institution has defined. Select one or more to focus your dashboard on those courses.' },
-  { key: 'instructors',   label: 'Instructors',    description: 'The instructors teaching at your institution. Select one or more to focus on their courses.' },
-  { key: 'modality',      label: 'Modalities',     description: 'The delivery format of courses. Select one or more to filter by how courses are taught.' },
+  { key: 'subAccounts',  label: 'Sub Accounts',  description: 'Divisions or colleges within your institution. Select one or more to limit your dashboard to those areas.' },
+  { key: 'courseGroups', label: 'Course Groups', description: 'Institution-wide course metadata your institution has defined. Select one or more to focus your dashboard on those courses.' },
+  { key: 'term',         label: 'Term',          description: "The academic term or semester you want to focus on. Select one or more to filter your dashboard's data." },
+  { key: 'cohorts',      label: 'Cohorts',       description: 'People-level groups your institution has defined. Select one or more to focus your dashboard on those students.' },
+  { key: 'tags',         label: 'Tags',          description: 'Institution-wide metadata attached to a person. Select one or more to focus your dashboard on those students.' },
+  { key: 'modality',     label: 'Modalities',    description: 'The delivery format of courses. Select one or more to filter by how courses are taught.' },
+  { key: 'instructors',  label: 'Instructors',   description: 'The instructors teaching at your institution. Select one or more to focus on their courses.' },
+  { key: 'courses',      label: 'Courses',       description: 'Individual courses offered at your institution. Select one or more to narrow your dashboard.' },
 ]
 
 function ScopeField({ fieldDef, selected, onAdd, onRemove, audiencePerms }) {

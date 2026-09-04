@@ -4,6 +4,12 @@ import {
   SCOPE_OPTIONS,
   AUTO_RECOMMENDATIONS,
 } from '../../data/mock/onboardingOptions.js'
+import {
+  isLiveField,
+  getLiveCountLabel,
+  getLiveMembers,
+  getMemberKind,
+} from '../../data/mock/scopeGraph.js'
 import './EditScopeModal.css'
 
 /* Map of which dashboard widgets are touched by which scope category.
@@ -12,7 +18,8 @@ import './EditScopeModal.css'
 const WIDGET_IMPACTS = {
   subAccounts: ['Sub-Account Health', 'Institution Snapshot'],
   term: ['Course Status', 'Course Readiness'],
-  studentGroups: ['Students in Need of Attention', 'Student Overview'],
+  cohorts: ['Students in Need of Attention', 'Student Overview'],
+  tags: ['Students in Need of Attention', 'Student Overview'],
   courses: ['Course Performance', 'Course Metrics'],
   courseGroups: ['Course Status', 'LTI Adoption'],
   instructors: ['Faculty Engagement'],
@@ -87,39 +94,14 @@ function parseCount(meta) {
   return parseInt(match[0].replace(/,/g, ''), 10)
 }
 
-/* Per-category configuration: how members are described, how the
-   count label reads when SCOPE_OPTIONS doesn't have a meta string,
-   and what kind of member to generate. */
+/* Per-category configuration for fields OUTSIDE the live-narrowing
+   graph (Term, Modality) — these keep the original hash-generated mock
+   member list, since they don't have real counts to draw from. */
 const CATEGORY_CONFIG = {
-  subAccounts: {
-    memberKind: 'courses',
-    countNoun: 'courses',
-    description: (name) => `Courses and activity within the ${name} sub-account at your institution.`,
-  },
   term: {
     memberKind: 'courses',
     countNoun: 'courses',
     description: (name) => `Courses and activity scoped to the ${name} academic term.`,
-  },
-  studentGroups: {
-    memberKind: 'students',
-    countNoun: 'students',
-    description: (name) => `Students currently included in the "${name}" group at your institution.`,
-  },
-  courses: {
-    memberKind: 'students',
-    countNoun: 'students',
-    description: (name) => `Students enrolled in ${name} for the current term.`,
-  },
-  courseGroups: {
-    memberKind: 'courses',
-    countNoun: 'courses',
-    description: (name) => `Courses included in the ${name} group at your institution.`,
-  },
-  instructors: {
-    memberKind: 'courses',
-    countNoun: 'courses',
-    description: (name) => `Courses currently being taught by ${name}.`,
   },
   modality: {
     memberKind: 'courses',
@@ -128,10 +110,34 @@ const CATEGORY_CONFIG = {
   },
 }
 
+/* Description templates for the live-narrowing fields — their counts
+   and member lists come from scopeGraph.js, but the descriptive copy
+   still lives here. */
+const LIVE_CATEGORY_CONFIG = {
+  subAccounts: {
+    description: (name) => `Courses and activity within the ${name} sub-account at your institution.`,
+  },
+  courseGroups: {
+    description: (name) => `Courses tagged "${name}" — institution-wide course metadata, not owned by any sub account.`,
+  },
+  cohorts: {
+    description: (name) => `Students currently included in the "${name}" cohort at your institution.`,
+  },
+  tags: {
+    description: (name) => `Students tagged "${name}" — institution-wide metadata, not owned by any cohort.`,
+  },
+  instructors: {
+    description: (name) => `Courses currently being taught by ${name}.`,
+  },
+  courses: {
+    description: (name) => `Students enrolled in ${name} for the current term.`,
+  },
+}
+
 /* Specific overrides for descriptions where the generic template reads
    awkwardly with a particular chip name. Add more here as you find them. */
 const CUSTOM_DESCRIPTIONS = {
-  studentGroups: {
+  cohorts: {
     'Students on Probation': 'Students currently flagged with a probation status by your institution.',
     'Undecided/Exploratory Students': 'Students who have not yet declared a major or are exploring options.',
     'International Students': 'Students enrolled from outside the country.',
@@ -146,14 +152,31 @@ const CUSTOM_DESCRIPTIONS = {
   },
 }
 
-/* For categories without a meta count (Term, Modality, Instructors),
-   pick a reasonable mock count derived from the chip's name so it's
+/* For categories without a meta count (Term, Modality), pick a
+   reasonable mock count derived from the chip's name so it's
    consistent across renders. */
 function fallbackCount(seed) {
   return 60 + (hashSeed(seed) % 200)
 }
 
-function inspectorDataFor(field, value) {
+function inspectorDataFor(field, value, scope) {
+  if (isLiveField(field.key)) {
+    const config = LIVE_CATEGORY_CONFIG[field.key]
+    if (!config) return null
+    const memberKind = getMemberKind(field.key)
+    const members = getLiveMembers(field.key, value, scope)
+    const countLabel = getLiveCountLabel(field.key, value, scope) || `${members.length} ${memberKind}`
+    const description = CUSTOM_DESCRIPTIONS[field.key]?.[value] || config.description(value)
+    return {
+      title: value,
+      countLabel,
+      countTotal: members.length,
+      description,
+      memberKind,
+      members,
+    }
+  }
+
   const config = CATEGORY_CONFIG[field.key]
   if (!config) return null
 
@@ -244,6 +267,7 @@ function SearchIcon() {
 /* ── Field row (left pane) ───────────────────────────────────────────── */
 function ScopePicker({
   field,
+  scope,
   originalValues,
   activeValues,
   removedValues,
@@ -300,6 +324,7 @@ function ScopePicker({
   )
 
   const selectedCount = activeValues.length
+  const liveField = isLiveField(field.key)
 
   return (
     <div className="editscope-field">
@@ -373,6 +398,11 @@ function ScopePicker({
               title={removed ? `Restore ${value}` : `Inspect ${value}`}
             >
               <span className="editscope-chip-label">{value}</span>
+              {liveField && !removed && (
+                <span className="editscope-chip-count">
+                  {getLiveCountLabel(field.key, value, scope)}
+                </span>
+              )}
               <button
                 type="button"
                 className="editscope-chip-action"
@@ -400,22 +430,27 @@ function ScopePicker({
               {available.length === 0 ? (
                 <div className="editscope-add-empty">All options added</div>
               ) : (
-                available.map((option) => (
-                  <button
-                    key={option.value}
-                    type="button"
-                    className="editscope-add-item"
-                    onClick={() => {
-                      onAdd(field.key, option.value)
-                      setOpen(false)
-                    }}
-                  >
-                    <div className="editscope-add-item-name">{option.value}</div>
-                    {option.meta && (
-                      <div className="editscope-add-item-meta">{option.meta}</div>
-                    )}
-                  </button>
-                ))
+                available.map((option) => {
+                  const meta = liveField
+                    ? getLiveCountLabel(field.key, option.value, scope)
+                    : option.meta
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      className="editscope-add-item"
+                      onClick={() => {
+                        onAdd(field.key, option.value)
+                        setOpen(false)
+                      }}
+                    >
+                      <div className="editscope-add-item-name">{option.value}</div>
+                      {meta && (
+                        <div className="editscope-add-item-meta">{meta}</div>
+                      )}
+                    </button>
+                  )
+                })
               )}
             </div>
           )}
@@ -426,7 +461,7 @@ function ScopePicker({
 }
 
 /* ── Inspector panel (right pane) ────────────────────────────────────── */
-function InspectorPanel({ field, value, onClear }) {
+function InspectorPanel({ field, value, scope, onClear }) {
   const [search, setSearch] = useState('')
   const [visibleCount, setVisibleCount] = useState(50)
   const listRef = useRef(null)
@@ -452,7 +487,7 @@ function InspectorPanel({ field, value, onClear }) {
     )
   }
 
-  const data = inspectorDataFor(field, value)
+  const data = inspectorDataFor(field, value, scope)
   if (!data) return null
 
   const filtered = search
@@ -713,6 +748,7 @@ export default function EditScopeModal({ isOpen, currentScope, mode, onApply, on
               <ScopePicker
                 key={field.key}
                 field={field}
+                scope={scope}
                 originalValues={originalScope?.[field.key] || []}
                 activeValues={scope?.[field.key] || []}
                 removedValues={Array.from(removedItems[field.key] || [])}
@@ -747,6 +783,7 @@ export default function EditScopeModal({ isOpen, currentScope, mode, onApply, on
           <InspectorPanel
             field={inspectedField}
             value={inspectedItem?.value}
+            scope={scope}
             onClear={() => setInspectedItem(null)}
           />
         </div>

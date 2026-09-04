@@ -5,7 +5,8 @@ import './ScopeSummary.css'
 const PLURAL_LABEL = {
   subAccounts:   'sub-accounts',
   term:          'terms',
-  studentGroups: 'student groups',
+  cohorts:       'cohorts',
+  tags:          'tags',
   courses:       'courses',
   courseGroups:  'course groups',
   instructors:   'instructors',

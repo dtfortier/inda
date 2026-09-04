@@ -339,6 +339,13 @@
   white-space: nowrap;
 }
 
+.editscope-chip-count {
+  white-space: nowrap;
+  font-weight: 500;
+  opacity: 0.65;
+  font-size: 0.85em;
+}
+
 .editscope-chip-action {
   background: none;
   border: none;

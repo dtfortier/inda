@@ -464,6 +464,12 @@
   color: var(--color-btn-primary-bg);
 }
 
+.scope-chip-count {
+  font-weight: 500;
+  opacity: 0.7;
+  font-size: 0.85em;
+}
+
 .scope-legend {
   display: flex;
   gap: 20px;

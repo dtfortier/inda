@@ -60,7 +60,7 @@ function seedDashboards() {
         mode: 'manual',
         scope: {
           term: ['Fall 2024'],
-          studentGroups: ['Students on Probation'],
+          cohorts: ['Students on Probation'],
           subAccounts: ['College of Arts'],
         },
       },
@@ -76,8 +76,8 @@ function seedDashboards() {
         scope: {
           subAccounts: ['College of Science'],
           term: ['Spring 2025'],
-          studentGroups: ['First-generation Students', 'Transfer Students'],
-          courses: ['BIO 101', 'CHEM 201'],
+          cohorts: ['First-generation Students', 'Transfer Students'],
+          courses: ['BIO 101 — Intro to Biology', 'CS 201 — Data Structures'],
         },
       },
       updatedAt: now - 1000 * 60 * 60 * 24,
@@ -88,7 +88,7 @@ function seedDashboards() {
       config: {
         mode: 'manual',
         scope: {
-          studentGroups: ['Student Athletes'],
+          cohorts: ['Student Athletes'],
           term: ['Spring 2025'],
           subAccounts: ['College of Science', 'College of Business'],
         },
@@ -103,7 +103,7 @@ function seedDashboards() {
         scope: {
           subAccounts: ['College of Arts'],
           term: ['Spring 2025', 'Fall 2024'],
-          studentGroups: ['Students on Probation', 'Undecided/Exploratory'],
+          cohorts: ['Students on Probation', 'Undecided/Exploratory Students'],
         },
       },
       updatedAt: now - 1000 * 60 * 60 * 120,
@@ -114,7 +114,7 @@ function seedDashboards() {
       config: {
         mode: 'auto',
         scope: {
-          studentGroups: ['First-generation Students', 'Undecided/Exploratory', 'Transfer Students'],
+          cohorts: ['First-generation Students', 'Undecided/Exploratory Students', 'Transfer Students'],
           term: ['Spring 2025'],
           subAccounts: ['College of Education'],
         },
