@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
+import { SCOPE_OPTIONS } from '../../data/mock/onboardingOptions.js'
+import { isLiveField, getLiveCountLabel } from '../../data/mock/scopeGraph.js'
 import './CreateDashboardModal.css'
 
 /* ── Mock data ─────────────────────────────────────────────── */
@@ -9,9 +11,9 @@ const MYSELF = {
   role: 'Administrator',
   access: 'Full access · All permissions',
   permissions: {
-    subAccounts:  { count: 5,  total: 5,  label: '5 of 5' },
-    term:         { count: 3,  total: 3,  label: '3 of 3' },
-    cohorts:      { count: 12, total: 12, label: '12 of 12' },
+    subAccounts:  { count: 7,  total: 7,  label: '7 of 7' },
+    term:         { count: 5,  total: 5,  label: '5 of 5' },
+    cohorts:      { count: 11, total: 11, label: '11 of 11' },
     tags:         { count: 10, total: 10, label: '10 of 10' },
     courses:      { count: null, label: 'All' },
     courseGroups: { count: null, label: 'All' },
@@ -27,9 +29,9 @@ const OTHER_USERS = [
     role: 'Advisor · College of Science',
     access: 'Limited access',
     permissions: {
-      subAccounts:  { count: 1, total: 5,  label: '1 of 5' },
-      term:         { count: 1, total: 3,  label: '1 of 3' },
-      cohorts:      { count: 3, total: 12, label: '3 of 12' },
+      subAccounts:  { count: 1, total: 7,  label: '1 of 7' },
+      term:         { count: 1, total: 5,  label: '1 of 5' },
+      cohorts:      { count: 3, total: 11, label: '3 of 11' },
       tags:         { count: 2, total: 10, label: '2 of 10' },
       courses:      { count: null, label: 'Limited' },
       courseGroups: { count: null, label: 'Limited' },
@@ -43,9 +45,9 @@ const OTHER_USERS = [
     role: 'Dean · College of Business',
     access: 'Partial access',
     permissions: {
-      subAccounts:  { count: 2, total: 5,  label: '2 of 5' },
-      term:         { count: 3, total: 3,  label: '3 of 3' },
-      cohorts:      { count: 8, total: 12, label: '8 of 12' },
+      subAccounts:  { count: 2, total: 7,  label: '2 of 7' },
+      term:         { count: 5, total: 5,  label: '5 of 5' },
+      cohorts:      { count: 8, total: 11, label: '8 of 11' },
       tags:         { count: 7, total: 10, label: '7 of 10' },
       courses:      { count: null, label: 'All' },
       courseGroups: { count: null, label: 'Limited' },
@@ -59,9 +61,9 @@ const OTHER_USERS = [
     role: 'Faculty · Department of Biology',
     access: 'Limited access',
     permissions: {
-      subAccounts:  { count: 1, total: 5,  label: '1 of 5' },
-      term:         { count: 2, total: 3,  label: '2 of 3' },
-      cohorts:      { count: 2, total: 12, label: '2 of 12' },
+      subAccounts:  { count: 1, total: 7,  label: '1 of 7' },
+      term:         { count: 2, total: 5,  label: '2 of 5' },
+      cohorts:      { count: 2, total: 11, label: '2 of 11' },
       tags:         { count: 1, total: 10, label: '1 of 10' },
       courses:      { count: null, label: 'Limited' },
       courseGroups: { count: null, label: 'None' },
@@ -90,59 +92,11 @@ const DEFAULT_WIDGETS = [
   'Enrollment Trend',
 ]
 
-const ALL_OPTIONS = {
-  subAccounts:   [
-    { value: 'College of Business',   meta: '142 courses' },
-    { value: 'College of Science',    meta: '98 courses' },
-    { value: 'College of Arts',       meta: '74 courses' },
-    { value: 'College of Education',  meta: '55 courses' },
-    { value: 'School of Engineering', meta: '120 courses' },
-  ],
-  term:          [
-    { value: 'Spring 2025' },
-    { value: 'Fall 2024' },
-    { value: 'Winter 2025' },
-  ],
-  cohorts: [
-    { value: 'First-generation Students', meta: '892 students' },
-    { value: 'Transfer Students',         meta: '341 students' },
-    { value: 'Student Athletes',          meta: '215 students' },
-    { value: 'Students on Probation',     meta: '128 students' },
-    { value: 'International Students',    meta: '476 students' },
-    { value: 'Biology Majors',            meta: '203 students' },
-    { value: 'Undecided/Exploratory',     meta: '312 students' },
-    { value: 'Honor Students',            meta: '189 students' },
-  ],
-  tags: [
-    { value: 'Female',                meta: '4,812 students' },
-    { value: 'Pell Grant Recipient',  meta: '3,105 students' },
-    { value: "Dean's List",           meta: '1,467 students' },
-    { value: 'Work-Study Employed',   meta: '1,802 students' },
-  ],
-  courses:       [
-    { value: 'BIO 101',  meta: '28 students' },
-    { value: 'CHEM 201', meta: '22 students' },
-    { value: 'ENG 110',  meta: '35 students' },
-    { value: 'MATH 150', meta: '30 students' },
-  ],
-  courseGroups:  [
-    { value: 'Independent Study',         meta: '12 courses' },
-    { value: 'Pre-Registration Eligible', meta: '45 courses' },
-    { value: 'South Campus',              meta: '28 courses' },
-    { value: 'Cross-Listed Courses',      meta: '19 courses' },
-  ],
-  instructors:   [
-    { value: 'Dr. Emily Carter' },
-    { value: 'Prof. James Liu' },
-    { value: 'Dr. Maria Santos' },
-    { value: 'Dr. Kevin Osei' },
-  ],
-  modality:      [
-    { value: 'In-Person' },
-    { value: 'Online' },
-    { value: 'Hybrid' },
-  ],
-}
+/* Sourced from the same canonical scope data as Onboarding/Edit Scope
+   (onboardingOptions.js → scopeGraph.js) rather than a separate,
+   hand-authored list — so values here actually exist in the live
+   cross-narrowing graph and produce meaningful counts below. */
+const ALL_OPTIONS = SCOPE_OPTIONS
 
 function getPermittedOptions(key, audiencePerms) {
   const perm = audiencePerms[key]
@@ -373,7 +327,7 @@ const SCOPE_FIELDS = [
   { key: 'courses',      label: 'Courses',       description: 'Individual courses offered at your institution. Select one or more to narrow your dashboard.' },
 ]
 
-function ScopeField({ fieldDef, selected, onAdd, onRemove, audiencePerms }) {
+function ScopeField({ fieldDef, scope, selected, onAdd, onRemove, audiencePerms }) {
   const [popoverOpen, setPopoverOpen] = useState(false)
   const [infoOpen, setInfoOpen]       = useState(false)
   const addRef = useRef(null)
@@ -392,6 +346,7 @@ function ScopeField({ fieldDef, selected, onAdd, onRemove, audiencePerms }) {
 
   const permittedOptions = getPermittedOptions(fieldDef.key, audiencePerms)
   const available = permittedOptions.filter(o => !selected.includes(o.value))
+  const liveField = isLiveField(fieldDef.key)
 
   return (
     <div className={`cdm-scope-field${isNone ? ' cdm-scope-field--disabled' : ''}`}>
@@ -415,6 +370,9 @@ function ScopeField({ fieldDef, selected, onAdd, onRemove, audiencePerms }) {
           {selected.map(val => (
             <span key={val} className="cdm-scope-chip">
               <span>{val}</span>
+              {liveField && (
+                <span className="cdm-scope-chip-count">{getLiveCountLabel(fieldDef.key, val, scope)}</span>
+              )}
               <button className="cdm-scope-chip-remove" onClick={() => onRemove(fieldDef.key, val)} aria-label={`Remove ${val}`}>
                 <CloseIcon />
               </button>
@@ -428,12 +386,15 @@ function ScopeField({ fieldDef, selected, onAdd, onRemove, audiencePerms }) {
               <div className="cdm-scope-add-menu">
                 {available.length === 0
                   ? <div className="cdm-scope-add-empty">All available options selected</div>
-                  : available.map(opt => (
-                    <button key={opt.value} className="cdm-scope-add-item" onClick={() => { onAdd(fieldDef.key, opt.value); setPopoverOpen(false) }}>
-                      <div className="cdm-scope-add-item-name">{opt.value}</div>
-                      {opt.meta && <div className="cdm-scope-add-item-meta">{opt.meta}</div>}
-                    </button>
-                  ))
+                  : available.map(opt => {
+                    const meta = liveField ? getLiveCountLabel(fieldDef.key, opt.value, scope) : opt.meta
+                    return (
+                      <button key={opt.value} className="cdm-scope-add-item" onClick={() => { onAdd(fieldDef.key, opt.value); setPopoverOpen(false) }}>
+                        <div className="cdm-scope-add-item-name">{opt.value}</div>
+                        {meta && <div className="cdm-scope-add-item-meta">{meta}</div>}
+                      </button>
+                    )
+                  })
                 }
               </div>
             )}
@@ -465,6 +426,7 @@ function StepScope({ scope, onScopeChange, audience }) {
           <ScopeField
             key={f.key}
             fieldDef={f}
+            scope={scope}
             selected={scope[f.key] || []}
             onAdd={handleAdd}
             onRemove={handleRemove}

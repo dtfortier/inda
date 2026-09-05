@@ -389,6 +389,13 @@
   color: var(--color-btn-primary-bg, #0e1f5b);
 }
 
+.cdm-scope-chip-count {
+  white-space: nowrap;
+  font-weight: 500;
+  opacity: 0.65;
+  font-size: 0.85em;
+}
+
 .cdm-scope-chip-remove {
   background: none;
   border: none;
